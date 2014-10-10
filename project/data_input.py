@@ -8,8 +8,8 @@ def sanitize(filename):
 
     Example: ~/input.txt -> /home/<your_home/input.txt
     """
-    # TODO: sanitize
-    # See:
+    # TODO: Sanitize
+    # See #1
     return filename
 
 def read_file(filename):
