@@ -13,6 +13,7 @@ def main():
         return usage()
 
     data = data_input.read_file(sys.argv[1])
+    data
 
 if __name__ == '__main__':
     main()
