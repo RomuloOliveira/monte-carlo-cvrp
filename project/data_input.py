@@ -157,5 +157,3 @@ def read_file(filename):
         raise Exception('Not a CVRP TSPLIB problem. Found: {}'.format(specs['TYPE']))
 
     print specs
-
-
