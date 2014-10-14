@@ -1,7 +1,11 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+import re
+
+def strip(line):
+    """Removes any \r or \n from line and remove trailing whitespaces"""
+    return line.replace('\r\n', '').strip() # remove new lines and trailing whitespaces
 
 def sanitize(filename):
     """Returns a sanitized file name with absolut path
@@ -11,6 +15,61 @@ def sanitize(filename):
     # TODO: Sanitize
     # See #1
     return filename
+
+def _parse_depot_section(f):
+    """Parse TSPLIB DEPOT_SECTION data part from file descriptor f
+
+    Returns an array of depots
+    """
+    depots = []
+
+    for line in f:
+        line = strip(line)
+        if line == '-1': # End of section
+            break
+        else:
+            depots.append(line)
+
+    return depots
+
+def _parse_nodes_section(f, current_section, nodes):
+    """Parse TSPLIB NODE_COORD_SECTION or DEMAND_SECTION from file descript f
+
+    Returns a dict containing the node as key
+    """
+    section = {}
+    dimensions = None
+
+    if current_section == 'NODE_COORD_SECTION':
+        dimensions = 3 # i: (i, j)
+    elif current_section == 'DEMAND_SECTION':
+        dimensions = 2 # i: q
+    else:
+        raise Exception('Invalid section {}'.format(current_section))
+
+    n = 0
+    for line in f:
+        line = strip(line)
+
+        # Check dimensions
+        definitions = re.split('\s*', line)
+        if len(definitions) != dimensions:
+            raise Exception('Invalid dimensions from section {}. Expected: {}'.format(current_section, dimensions))
+
+        node = int(definitions[0])
+        values = [int(v) for v in definitions[1:]]
+
+        section[node] = values
+
+        n = n + 1
+        if n == nodes:
+            break
+
+    # Assert all nodes were read
+    if n != nodes:
+        raise Exception('Missing {} nodes definition from section {}'.format(nodes - n, current_section))
+
+    return section
 
 def read_file(filename):
     """Reads a TSPLIB file and returns the problem data"""
@@ -23,9 +82,13 @@ def read_file(filename):
     used_specs = ['NAME', 'COMMENT', 'DIMENSION', 'CAPACITY', 'TYPE']
     used_data = ['NODE_COORD_SECTION', 'DEMAND_SECTION', 'DEPOT_SECTION']
 
+    f = open(sanitized_filename)
+
     # Parse specs part
-    for line in open(sanitized_filename):
-        line = line.replace('\r\n', '').strip() # remove new lines and trailing whitespaces
+    for line in f:
+        line = strip(line)
+
+        # Arbitrary sort, so we test everything out
         for s in used_specs:
             if line.startswith(s):
                 print s, line
@@ -37,6 +100,24 @@ def read_file(filename):
             break
 
     if len(specs) != len(used_specs):
-        raise Exception('Error parsing TSPLIB data: {} missing'.format(set(used_specs) - set(specs)))
+        raise Exception('Error parsing TSPLIB data: specs {} missing'.format(set(used_specs) - set(specs)))
+
+    # Parse data part
+    for line in f:
+        line = strip(line)
+
+        for d in used_data:
+            if line.startswith(d):
+                if d == 'DEPOT_SECTION':
+                    specs[d] = _parse_depot_section(f)
+                else:
+                    specs[d] = _parse_nodes_section(f, d, int(specs['DIMENSION']))
+
+        if len(specs) == len(used_specs) + len(used_data):
+            break
+
+    if len(specs) != len(used_specs) + len(used_data):
+        missing_specs = set(specs) - (set(used_specs) + set(used_data))
+        raise Exception('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
 
     print specs
