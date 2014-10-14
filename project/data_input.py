@@ -153,6 +153,9 @@ def read_file(filename):
     finally: # 'finally' is executed even when we re-raise exceptions
         f.close()
 
+    if specs['TYPE'] != 'CVRP':
+        raise Exception('Not a CVRP TSPLIB problem. Found: {}'.format(specs['TYPE']))
+
     print specs
 
 
