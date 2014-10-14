@@ -3,6 +3,14 @@
 
 import re
 
+class ParseException(Exception):
+    """Exception raised when something unexpected occurs in a TSPLIB file parsing"""
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 def strip(line):
     """Removes any \r or \n from line and remove trailing whitespaces"""
     return line.replace('\r\n', '').strip() # remove new lines and trailing whitespaces
@@ -45,7 +53,7 @@ def _parse_nodes_section(f, current_section, nodes):
     elif current_section == 'DEMAND_SECTION':
         dimensions = 2 # i: q
     else:
-        raise Exception('Invalid section {}'.format(current_section))
+        raise ParseException('Invalid section {}'.format(current_section))
 
     n = 0
     for line in f:
@@ -54,7 +62,7 @@ def _parse_nodes_section(f, current_section, nodes):
         # Check dimensions
         definitions = re.split('\s*', line)
         if len(definitions) != dimensions:
-            raise Exception('Invalid dimensions from section {}. Expected: {}'.format(current_section, dimensions))
+            raise ParseException('Invalid dimensions from section {}. Expected: {}'.format(current_section, dimensions))
 
         node = int(definitions[0])
         values = [int(v) for v in definitions[1:]]
@@ -67,7 +75,7 @@ def _parse_nodes_section(f, current_section, nodes):
 
     # Assert all nodes were read
     if n != nodes:
-        raise Exception('Missing {} nodes definition from section {}'.format(nodes - n, current_section))
+        raise ParseException('Missing {} nodes definition from section {}'.format(nodes - n, current_section))
 
     return section
 
@@ -112,7 +120,7 @@ def read_file(filename):
             break
 
     if len(specs) != len(used_specs):
-        raise Exception('Error parsing TSPLIB data: specs {} missing'.format(set(used_specs) - set(specs)))
+        raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(set(used_specs) - set(specs)))
 
     _post_process_specs(specs)
 
