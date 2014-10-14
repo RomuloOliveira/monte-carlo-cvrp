@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from os import path
 
 class ParseException(Exception):
     """Exception raised when something unexpected occurs in a TSPLIB file parsing"""
@@ -20,9 +21,7 @@ def sanitize(filename):
 
     Example: ~/input.txt -> /home/<your_home/input.txt
     """
-    # TODO: Sanitize
-    # See #1
-    return filename
+    return path.abspath(path.expanduser(path.expandvars(filename)))
 
 def _parse_depot_section(f):
     """Parse TSPLIB DEPOT_SECTION data part from file descriptor f
