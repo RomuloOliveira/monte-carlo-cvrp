@@ -154,6 +154,6 @@ def read_file(filename):
     finally: # 'finally' is executed even when we re-raise exceptions
         f.close()
 
-    print 'foo'
+    print specs
 
 
