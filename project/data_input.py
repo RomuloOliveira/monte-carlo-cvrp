@@ -71,6 +71,18 @@ def _parse_nodes_section(f, current_section, nodes):
 
     return section
 
+def _post_process_specs(specs):
+    """Post-process specs data after pure parsing
+
+    Casts any number expected values into integers
+
+    Remarks: Modifies the specs object
+    """
+    integer_specs = ['DIMENSION', 'CAPACITY']
+
+    for s in integer_specs:
+        specs[s] = int(specs[s])
+
 def read_file(filename):
     """Reads a TSPLIB file and returns the problem data"""
     sanitized_filename = sanitize(filename)
@@ -102,6 +114,8 @@ def read_file(filename):
     if len(specs) != len(used_specs):
         raise Exception('Error parsing TSPLIB data: specs {} missing'.format(set(used_specs) - set(specs)))
 
+    _post_process_specs(specs)
+
     # Parse data part
     for line in f:
         line = strip(line)
@@ -111,7 +125,7 @@ def read_file(filename):
                 if d == 'DEPOT_SECTION':
                     specs[d] = _parse_depot_section(f)
                 else:
-                    specs[d] = _parse_nodes_section(f, d, int(specs['DIMENSION']))
+                    specs[d] = _parse_nodes_section(f, d, specs['DIMENSION'])
 
         if len(specs) == len(used_specs) + len(used_data):
             break
