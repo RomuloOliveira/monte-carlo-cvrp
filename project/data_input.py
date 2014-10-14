@@ -91,18 +91,14 @@ def _post_process_specs(specs):
     for s in integer_specs:
         specs[s] = int(specs[s])
 
-def read_file(filename):
-    """Reads a TSPLIB file and returns the problem data"""
-    sanitized_filename = sanitize(filename)
-
+def _parse_tsplib(f):
+    """Parses a TSPLIB file descriptor and returns a dict containing the problem definition"""
     line = ''
 
     specs = {}
 
     used_specs = ['NAME', 'COMMENT', 'DIMENSION', 'CAPACITY', 'TYPE']
     used_data = ['NODE_COORD_SECTION', 'DEMAND_SECTION', 'DEPOT_SECTION']
-
-    f = open(sanitized_filename)
 
     # Parse specs part
     for line in f:
@@ -111,7 +107,6 @@ def read_file(filename):
         # Arbitrary sort, so we test everything out
         for s in used_specs:
             if line.startswith(s):
-                print s, line
                 specs[s] = line.split('{} :'.format(s))[-1].strip() # get value data part
                 break
 
@@ -140,6 +135,25 @@ def read_file(filename):
 
     if len(specs) != len(used_specs) + len(used_data):
         missing_specs = set(specs) - (set(used_specs) + set(used_data))
-        raise Exception('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
+        raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
 
-    print specs
+    return specs
+
+def read_file(filename):
+    """Reads a TSPLIB file and returns the problem data"""
+    sanitized_filename = sanitize(filename)
+
+    f = open(sanitized_filename)
+
+    specs = None
+
+    try:
+        specs = _parse_tsplib(f)
+    except ParseException:
+        raise
+    finally: # 'finally' is executed even when we re-raise exceptions
+        f.close()
+
+    print 'foo'
+
+
