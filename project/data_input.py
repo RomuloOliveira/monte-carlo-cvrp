@@ -145,16 +145,22 @@ def _setup_depot(specs):
     """
     specs['DEPOT'] = specs['DEPOT_SECTION']
 
+def _setup_demands(specs):
+    """Setup demand model"""
+    specs['DEMAND'] = specs['DEMAND_SECTION']
+
 def _post_process_data(specs):
     """Post-process specs data after complete parsing
 
     Processes:
         - Calculates distances and model it in a matrix
         - Setup depot model
+        - Setup demand model
     """
 
     _create_node_matrix(specs)
     _setup_depot(specs)
+    _setup_demands(specs)
 
 def _parse_tsplib(f):
     """Parses a TSPLIB file descriptor and returns a dict containing the problem definition"""
