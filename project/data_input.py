@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import re
+import math
+
 from os import path
 
 class ParseException(Exception):
@@ -78,8 +80,19 @@ def _parse_nodes_section(f, current_section, nodes):
 
     return section
 
+def calculate_euc_distance(a, b):
+    """Calculates Eclidian distances from two points a and b
+
+    Points are two-dimension tuples
+    """
+    x1, y1 = a
+    x2, y2 = b
+
+    return math.sqrt(((x1 - x2) ** 2) + (((y1 - y2) ** 2)))
+
+
 def _post_process_specs(specs):
-    """Post-process specs data after pure parsing
+    """Post-process specs after pure parsing
 
     Casts any number expected values into integers
 
@@ -89,6 +102,46 @@ def _post_process_specs(specs):
 
     for s in integer_specs:
         specs[s] = int(specs[s])
+
+def _create_node_matrix(specs):
+    """Calculates distances between nodes and model it in a matrix
+
+    'MATRIX' key added to `specs`
+    """
+    distances = specs['NODE_COORD_SECTION']
+    dimensions = specs['DIMENSION']
+
+    specs['MATRIX'] = {}
+
+    for i in distances:
+        origin = tuple(distances[i])
+
+        specs['MATRIX'][i] = {}
+
+        for j in specs['NODE_COORD_SECTION']:
+            destination = tuple(distances[j])
+
+            distance = calculate_euc_distance(origin, destination)
+
+            specs['MATRIX'][i][j] = distance
+
+def _setup_depot(specs):
+    """Setup depot model
+
+    'DEPOT' key added to `specs`
+    """
+    specs['DEPOT'] = specs['DEPOT_SECTION']
+
+def _post_process_data(specs):
+    """Post-process specs data after complete parsing
+
+    Processes:
+        - Calculates distances and model it in a matrix
+        - Setup depot model
+    """
+
+    _create_node_matrix(specs)
+    _setup_depot(specs)
 
 def _parse_tsplib(f):
     """Parses a TSPLIB file descriptor and returns a dict containing the problem definition"""
@@ -135,6 +188,8 @@ def _parse_tsplib(f):
     if len(specs) != len(used_specs) + len(used_data):
         missing_specs = set(specs) - (set(used_specs) + set(used_data))
         raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
+
+    _post_process_data(specs)
 
     return specs
 
