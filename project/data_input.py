@@ -86,6 +86,34 @@ def _parse_nodes_section(f, current_section, nodes):
 
     return section
 
+def _parse_edge_weight(f, nodes):
+    """Parse TSPLIB EDGE_WEIGHT_SECTION from file f
+
+    Supports only FULL_MATRIX for now
+    """
+    matrix = []
+
+    n = 0
+
+    for line in f:
+        line = strip(line)
+
+        regex = re.compile('\s+')
+
+        row = regex.split(line)
+
+        matrix.append(row)
+
+        n = n + 1
+
+        if n == nodes:
+            break
+
+    if n != nodes:
+        raise ParseException('Missing {} nodes definition from section EDGE_WEIGHT_SECTION'.format(nodes - n))
+
+    return matrix
+
 def calculate_euc_distance(a, b):
     """Calculates Eclidian distances from two points a and b
 
@@ -109,9 +137,10 @@ def _post_process_specs(specs):
     for s in integer_specs:
         specs[s] = int(specs[s])
 
-def _create_node_matrix(specs):
-    """Calculates distances between nodes and model it in a upper triangular matrix
+def _create_node_matrix_from_coord_section(specs):
+    """Transformed parsed data from NODE_COORD_SECTION into an upper triangular matrix
 
+    Calculates distances between nodes
     'MATRIX' key added to `specs`
     """
     distances = specs['NODE_COORD_SECTION']
@@ -136,6 +165,38 @@ def _create_node_matrix(specs):
                 continue
 
             specs['MATRIX'][i][j] = distance
+
+def _create_node_matrix_from_full_matrix(specs):
+    """Transform parsed data from EDGE_WEIGHT_SECTION into an upper triangular matrix
+
+    'MATRIX' key added to `specs`
+    """
+    old_matrix = specs['EDGE_WEIGHT_SECTION']
+    nodes = specs['DIMENSION']
+
+    specs['MATRIX'] = {}
+
+    for i in range(nodes):
+        specs['MATRIX'][i] = {}
+
+        for j in range(nodes):
+            if i > j:
+                continue
+
+            specs['MATRIX'][i][j] = int(old_matrix[i][j])
+
+def _create_node_matrix(specs):
+    """Transform parsed data into an upper triangular matrix
+
+    'MATRIX' key added to `specs`
+    """
+    if specs['EDGE_WEIGHT_TYPE'] == 'EUC_2D':
+        _create_node_matrix_from_coord_section(specs)
+    elif specs['EDGE_WEIGHT_FORMAT'] == 'FULL_MATRIX':
+        _create_node_matrix_from_full_matrix(specs)
+    else:
+        raise ParseException('Could not create node matrix: Invalid EDGE_WEIGHT_TYPE or EDGE_WEIGHT_FORMAT')
+
 
 def _setup_depot(specs):
     """Setup depot model
@@ -175,14 +236,14 @@ def _parse_tsplib(f):
         line = strip(line)
 
         # Arbitrary sort, so we test everything out
+        s = None
         for s in used_specs:
             if line.startswith(s):
                 specs[s] = line.split('{} :'.format(s))[-1].strip() # get value data part
-
-                if s == 'EDGE_WEIGHT_TYPE' and specs[s] == 'EXPLICIT':
-                    used_specs.append('EDGE_WEIGHT_FORMAT')
-
                 break
+
+        if s == 'EDGE_WEIGHT_TYPE' and specs[s] == 'EXPLICIT':
+            used_specs.append('EDGE_WEIGHT_FORMAT')
 
         # All specs read
         if len(specs) == len(used_specs):
@@ -192,10 +253,14 @@ def _parse_tsplib(f):
         missing_specs = set(used_specs).symmetric_difference(set(specs))
         raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
 
+    print specs
+
     if specs['EDGE_WEIGHT_TYPE'] == 'EUC_2D':
         used_data.append('NODE_COORD_SECTION')
     elif specs['EDGE_WEIGHT_FORMAT'] == 'FULL_MATRIX':
         used_data.append('EDGE_WEIGHT_SECTION')
+    else:
+        raise ParseException('EDGE_WEIGHT_TYPE or EDGE_WEIGHT_FORMAT not supported')
 
     _post_process_specs(specs)
 
@@ -207,8 +272,10 @@ def _parse_tsplib(f):
             if line.startswith(d):
                 if d == 'DEPOT_SECTION':
                     specs[d] = _parse_depot_section(f)
-                else:
+                elif d in ['NODE_COORD_SECTION', 'DEMAND_SECTION']:
                     specs[d] = _parse_nodes_section(f, d, specs['DIMENSION'])
+                elif d == 'EDGE_WEIGHT_SECTION':
+                    specs[d] = _parse_edge_weight(f, specs['DIMENSION'])
 
         if len(specs) == len(used_specs) + len(used_data):
             break
