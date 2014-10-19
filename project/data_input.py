@@ -39,7 +39,10 @@ def _parse_depot_section(f):
         else:
             depots.append(line)
 
-    return depots
+    if len(depots) != 1:
+        raise ParseException('One and only one depot is supported')
+
+    return int(depots[0])
 
 def _parse_nodes_section(f, current_section, nodes):
     """Parse TSPLIB NODE_COORD_SECTION or DEMAND_SECTION from file descript f
