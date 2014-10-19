@@ -14,15 +14,21 @@ def main():
         return usage()
 
     data = data_input.read_file(sys.argv[1])
-    vehicles = sys.argv[2]
+    vehicles = int(sys.argv[2])
 
-    routes, savings_list = clarke_wright.solve(data, vehicles)
+    routes, savings_list, vehicles_run = clarke_wright.solve(data, vehicles)
 
     print 'DISTANCE MATRIX'
     util.print_upper_triangular_matrix(data['MATRIX'])
 
     print 'SAVINGS LIST MATRIX'
     util.print_upper_triangular_matrix(savings_list)
+
+    print 'ROUTING MATRIX'
+    util.print_upper_triangular_matrix(routes)
+
+    print 'VEHICLES RUN'
+    print vehicles_run
 
 
 if __name__ == '__main__':
