@@ -5,8 +5,10 @@ def print_upper_triangular_matrix(matrix):
     """Prints a CVRP data dict matrix"""
 
     # Print column header
+    # Assumes first row contains all needed headers
+    first = sorted(matrix.keys())[0]
     print '\t',
-    for i in matrix:
+    for i in matrix[first]:
         print '{}\t'.format(i),
     print
 
