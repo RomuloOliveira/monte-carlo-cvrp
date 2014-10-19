@@ -115,7 +115,6 @@ def _create_node_matrix(specs):
     'MATRIX' key added to `specs`
     """
     distances = specs['NODE_COORD_SECTION']
-    dimensions = specs['DIMENSION']
 
     specs['MATRIX'] = {}
 
