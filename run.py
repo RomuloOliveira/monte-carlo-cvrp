@@ -35,7 +35,7 @@ def main():
         print '{}: {}'.format(solution, cost)
     print 'Total cost: {}'.format(total_cost)
 
-    optimum = [
+    optimum_An32k5 = [
         [25, 28],
         [27, 8, 14, 18, 20, 32, 22],
         [7, 4, 3, 24, 29, 5, 12, 15],
