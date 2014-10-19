@@ -167,8 +167,8 @@ def _parse_tsplib(f):
 
     specs = {}
 
-    used_specs = ['NAME', 'COMMENT', 'DIMENSION', 'CAPACITY', 'TYPE']
-    used_data = ['NODE_COORD_SECTION', 'DEMAND_SECTION', 'DEPOT_SECTION']
+    used_specs = ['NAME', 'COMMENT', 'DIMENSION', 'CAPACITY', 'TYPE', 'EDGE_WEIGHT_TYPE']
+    used_data = ['DEMAND_SECTION', 'DEPOT_SECTION']
 
     # Parse specs part
     for line in f:
@@ -178,6 +178,10 @@ def _parse_tsplib(f):
         for s in used_specs:
             if line.startswith(s):
                 specs[s] = line.split('{} :'.format(s))[-1].strip() # get value data part
+
+                if s == 'EDGE_WEIGHT_TYPE' and specs[s] == 'EXPLICIT':
+                    used_specs.append('EDGE_WEIGHT_FORMAT')
+
                 break
 
         # All specs read
@@ -187,6 +191,11 @@ def _parse_tsplib(f):
     if len(specs) != len(used_specs):
         missing_specs = set(used_specs).symmetric_difference(set(specs))
         raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
+
+    if specs['EDGE_WEIGHT_TYPE'] == 'EUC_2D':
+        used_data.append('NODE_COORD_SECTION')
+    elif specs['EDGE_WEIGHT_FORMAT'] == 'FULL_MATRIX':
+        used_data.append('EDGE_WEIGHT_SECTION')
 
     _post_process_specs(specs)
 
