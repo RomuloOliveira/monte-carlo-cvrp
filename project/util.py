@@ -33,4 +33,19 @@ def solution_length(data, solution):
 
     Solution is a list of node indexes
     """
-    pass
+
+    cost = 0
+    depot = data['DEPOT']
+
+    last = depot
+    for i in solution:
+        a, b = last, i
+        if a > b:
+            a, b = b, a
+
+        cost = cost + data['MATRIX'][a][b]
+        last = i
+
+    cost = cost + data['MATRIX'][depot][last]
+
+    return cost
