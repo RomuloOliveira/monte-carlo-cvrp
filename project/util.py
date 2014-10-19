@@ -27,3 +27,10 @@ def print_upper_triangular_matrix(matrix):
         print
 
         indent_count = indent_count + 1
+
+def solution_length(data, solution):
+    """Returns the solution length cost
+
+    Solution is a list of node indexes
+    """
+    pass
