@@ -229,3 +229,5 @@ def read_file(filename):
 
     if specs['TYPE'] != 'CVRP':
         raise Exception('Not a CVRP TSPLIB problem. Found: {}'.format(specs['TYPE']))
+
+    return specs
