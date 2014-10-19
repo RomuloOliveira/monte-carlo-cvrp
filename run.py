@@ -38,21 +38,22 @@ def main():
         print '{}: {}'.format(solution, cost)
     print 'Total cost: {}'.format(total_cost)
 
-    optimum_An32k5 = [
-        [25, 28],
-        [27, 8, 14, 18, 20, 32, 22],
-        [7, 4, 3, 24, 29, 5, 12, 15],
-        [31, 17, 2, 13],
-        [30, 19, 9, 10, 23, 16, 11, 26, 6, 21]
-    ]
+    if sys.argv[1].split('/')[-1] == 'A-n32-k5.vrp':
+        optimum_An32k5 = [
+            [25, 28],
+            [27, 8, 14, 18, 20, 32, 22],
+            [7, 4, 3, 24, 29, 5, 12, 15],
+            [31, 17, 2, 13],
+            [30, 19, 9, 10, 23, 16, 11, 26, 6, 21]
+        ]
 
-    print 'OPTIMAL SOLUTIONS'
-    total_cost = 0
-    for solution in optimum_An32k5:
-        cost = util.solution_length(data, solution)
-        total_cost = total_cost + cost
-        print '{}: {}'.format(solution, cost)
-    print 'Total cost: {}'.format(total_cost)
+        print 'OPTIMAL SOLUTIONS'
+        total_cost = 0
+        for solution in optimum_An32k5:
+            cost = util.solution_length(data, solution)
+            total_cost = total_cost + cost
+            print '{}: {}'.format(solution, cost)
+        print 'Total cost: {}'.format(total_cost)
 
 if __name__ == '__main__':
     main()
