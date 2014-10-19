@@ -177,13 +177,13 @@ def _create_node_matrix_from_full_matrix(specs):
     specs['MATRIX'] = {}
 
     for i in range(nodes):
-        specs['MATRIX'][i] = {}
+        specs['MATRIX'][i + 1] = {}
 
         for j in range(nodes):
             if i > j:
                 continue
 
-            specs['MATRIX'][i][j] = int(old_matrix[i][j])
+            specs['MATRIX'][i + 1][j + 1] = int(old_matrix[i][j])
 
 def _create_node_matrix(specs):
     """Transform parsed data into an upper triangular matrix
