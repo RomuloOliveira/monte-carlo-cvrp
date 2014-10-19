@@ -16,7 +16,17 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    routes, savings_list, vehicles_run = clarke_wright.solve(data, vehicles)
+    optimum = [[6, 10, 9, 8], [2, 3, 4, 5, 7]]
+
+    print 'OPTIMAL SOLUTIONS'
+    total_cost = 0
+    for solution in optimum:
+        cost = util.solution_length(data, solution)
+        total_cost = total_cost + cost
+        print '{}: {}'.format(solution, cost)
+    print 'Total cost: {}'.format(total_cost)
+
+    vehicles_run, savings_list  = clarke_wright.solve(data, vehicles)
 
     print 'DISTANCE MATRIX'
     util.print_upper_triangular_matrix(data['MATRIX'])
@@ -26,9 +36,6 @@ def main():
 
     print 'SAVINGS LIST MATRIX'
     print savings_list
-
-    print 'ROUTING MATRIX'
-    util.print_upper_triangular_matrix(routes)
 
     print 'SOLUTIONS'
     total_cost = 0

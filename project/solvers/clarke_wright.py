@@ -127,7 +127,9 @@ def compute_savings_list(data):
 
             savings_list[t] = data['MATRIX'][depot][i] + data['MATRIX'][depot][j] - data['MATRIX'][i][j]
 
-    sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1))
+    sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
+
+    print 'sorted_savings_list', sorted_savings_list
 
     return [nodes for nodes, saving in sorted_savings_list]
 
@@ -137,9 +139,6 @@ def solve(data, vehicles):
 
     vehicles_run = {}
     vehicles_demand = {}
-
-    initial_routes, allocations = create_initial_routes(data, vehicles_run, vehicles_demand)
-    routes = initial_routes.copy()
 
     print vehicles_run
     print vehicles_demand
@@ -172,16 +171,24 @@ def solve(data, vehicles):
     vehicles_run = [[] for _ in range(vehicles)]
     vehicles_demand = [0 for _ in range(vehicles)]
     allocations = {}
+    dimension = data['DIMENSION']
 
     print 'savings length', len(savings_list)
+    print 'savings_list', savings_list
 
     while savings_list:
-        break
+
+        if len(allocations) == dimension - 1:
+            break
+
         for i, j in savings_list:
 
             exausted = False
 
-            print vehicles_run
+            print 'vehicles_run', vehicles_run
+            print 'vehicles_demand', vehicles_demand
+            print 'allocations', sorted(allocations)
+            print 'remaining', len(savings_list)
             print 'iterating {}'.format((i, j))
 
             demand = data['DEMAND'][i] + data['DEMAND'][j]
@@ -204,7 +211,7 @@ def solve(data, vehicles):
                     print len(savings_list)
                     print vehicles_demand
                     raise Exception('fodeu')
-            elif i in allocations and j not in allocations or i in allocations and j not in allocations: # either i or j is allocated
+            elif (i in allocations and j not in allocations) or (j in allocations and i not in allocations): # either i or j is allocated
                 print '{} or {} not allocated'.format(i, j)
 
                 inserted = None
@@ -229,7 +236,7 @@ def solve(data, vehicles):
                         add_node(data, allocations, to_insert, allocations[inserted], vehicles_run, vehicles_demand, append)
 
                     exausted = True
-            elif i in allocations and j in allocations and allocations[i] != allocations[j]: # both allocated
+            elif (i in allocations and j in allocations) and (allocations[i] != allocations[j]): # both allocated
                 both_not_interior = vehicles_run[allocations[i]].index(i) == 0 or vehicles_run[allocations[i]].index(i) == len(vehicles_run[allocations[i]]) - 1
                 both_interior = not both_not_interior
 
@@ -247,7 +254,6 @@ def solve(data, vehicles):
                             append = True
 
                         add_node(data, allocations, j, allocations[i], vehicles_run, vehicles_demand, append)
-                        exausted = True
                         print 'merged'
                     elif can_add(data, i, vehicles_demand[allocations[j]]):
                         append = False
@@ -256,13 +262,15 @@ def solve(data, vehicles):
                             append = True
 
                         add_node(data, allocations, i, allocations[j], vehicles_run, vehicles_demand, append)
-                        exausted = True
                         print 'merged'
-                    exausted = True
+
+                exausted = True
 
                 if both_interior:
                     exausted = True
                     print 'both interior'
+            else:
+                exausted = True
 
 
             if exausted:
@@ -272,4 +280,4 @@ def solve(data, vehicles):
 
     print 'vehicles_run', vehicles_run
 
-    return routes, savings_list, vehicles_run
+    return vehicles_run, savings_list
