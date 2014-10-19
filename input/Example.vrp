@@ -1,5 +1,5 @@
 NAME : Example
-COMMENT : (http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html, Optimal value: 247)
+COMMENT : (http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html, two vehicles, Optimal value: 397)
 TYPE : CVRP
 DIMENSION : 10
 EDGE_WEIGHT_TYPE : EXPLICIT
