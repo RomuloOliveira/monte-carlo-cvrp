@@ -45,7 +45,7 @@ def main():
 
     print 'OPTIMAL SOLUTIONS'
     total_cost = 0
-    for solution in optimum:
+    for solution in optimum_An32k5:
         cost = util.solution_length(data, solution)
         total_cost = total_cost + cost
         print '{}: {}'.format(solution, cost)
