@@ -157,12 +157,12 @@ def solve(data, vehicles):
     #             vehicle_a = allocations[i]
     #             vehicle_b = allocations[j]
 
-    #             if can_add(data, j, vehicles_demand[vehicle_a]):
+    #             if can_add(data, [j], vehicles_demand[vehicle_a]):
     #                 add_node(data, allocations, j, vehicle_a, vehicles_run, vehicles_demand)
     #                 routes[i][j] = 1
     #                 routes[depot][i] = 1
     #                 routes[depot][j] = 1
-    #             elif can_add(data, i, vehicles_demand[vehicle_b]):
+    #             elif can_add(data, [i], vehicles_demand[vehicle_b]):
     #                 add_node(data, allocations, i, vehicle_b, vehicles_run, vehicles_demand)
     #                 routes[i][j] = 1
     #                 routes[depot][i] = 1
@@ -245,24 +245,24 @@ def solve(data, vehicles):
 
                 print 'both_not_interior? {}'.format(both_not_interior)
 
-                if both_not_interior:
-                    # Merge routes
-                    if can_add(data, j, vehicles_demand[allocations[i]]):
-                        append = False
+                # if both_not_interior:
+                #     # Merge routes
+                #     if can_add(data, [j], vehicles_demand[allocations[i]]):
+                #         append = False
 
-                        if vehicles_run[allocations[i]].index(i) == len(vehicles_run[allocations[i]]) - 1:
-                            append = True
+                #         if vehicles_run[allocations[i]].index(i) == len(vehicles_run[allocations[i]]) - 1:
+                #             append = True
 
-                        add_node(data, allocations, j, allocations[i], vehicles_run, vehicles_demand, append)
-                        print 'merged'
-                    elif can_add(data, i, vehicles_demand[allocations[j]]):
-                        append = False
+                #         add_node(data, allocations, j, allocations[i], vehicles_run, vehicles_demand, append)
+                #         print 'merged'
+                #     elif can_add(data, [i], vehicles_demand[allocations[j]]):
+                #         append = False
 
-                        if vehicles_run[allocations[j]].index(j) == len(vehicles_run[allocations[j]]) - 1:
-                            append = True
+                #         if vehicles_run[allocations[j]].index(j) == len(vehicles_run[allocations[j]]) - 1:
+                #             append = True
 
-                        add_node(data, allocations, i, allocations[j], vehicles_run, vehicles_demand, append)
-                        print 'merged'
+                #         add_node(data, allocations, i, allocations[j], vehicles_run, vehicles_demand, append)
+                #         print 'merged'
 
                 exausted = True
 
