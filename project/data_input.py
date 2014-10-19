@@ -68,6 +68,9 @@ def _parse_nodes_section(f, current_section, nodes):
         node = int(definitions[0])
         values = [int(v) for v in definitions[1:]]
 
+        if len(values) == 1:
+            values = values[0]
+
         section[node] = values
 
         n = n + 1
