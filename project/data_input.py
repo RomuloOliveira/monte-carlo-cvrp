@@ -104,7 +104,7 @@ def _post_process_specs(specs):
         specs[s] = int(specs[s])
 
 def _create_node_matrix(specs):
-    """Calculates distances between nodes and model it in a matrix
+    """Calculates distances between nodes and model it in a upper triangular matrix
 
     'MATRIX' key added to `specs`
     """
@@ -122,6 +122,13 @@ def _create_node_matrix(specs):
             destination = tuple(distances[j])
 
             distance = calculate_euc_distance(origin, destination)
+
+            #
+            # Upper triangular matrix
+            # if i > j, ij = 0
+            #
+            if i > j:
+                continue
 
             specs['MATRIX'][i][j] = distance
 
@@ -212,3 +219,9 @@ def read_file(filename):
         raise Exception('Not a CVRP TSPLIB problem. Found: {}'.format(specs['TYPE']))
 
     print specs
+
+    for i in specs['MATRIX']:
+        for j in specs['MATRIX'][i]:
+            print j,
+
+        print
