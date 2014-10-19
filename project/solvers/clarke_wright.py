@@ -1,6 +1,8 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
+import operator
+
 def can_add(data, i, remaining_demand):
     """Returns true if a vehicle with remaining demand `remaining_demand` has capacity to serve `i`"""
     demand = data['DEMAND'][i]
@@ -89,8 +91,6 @@ def compute_savings_list(data):
         if i == depot:
             continue
 
-        savings_list[i] = {}
-
         for j in data['MATRIX']:
             if j == depot:
                 continue
@@ -101,9 +101,13 @@ def compute_savings_list(data):
             if i == j:
                 continue
 
-            savings_list[i][j] = data['MATRIX'][depot][i] + data['MATRIX'][depot][j] - data['MATRIX'][i][j]
+            t = (i, j)
 
-    return savings_list
+            savings_list[t] = data['MATRIX'][depot][i] + data['MATRIX'][depot][j] - data['MATRIX'][i][j]
+
+    sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
+
+    return [nodes for nodes, saving in sorted_savings_list]
 
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
@@ -120,20 +124,13 @@ def solve(data, vehicles):
 
     depot = data['DEPOT']
 
-    for i in savings_list:
-        for j in savings_list[i]:
-            if i > j:
-                continue
-
+    for i, j in savings_list:
             #
             # (I)   t(0,i) and t(0, j) must be greater than zero.
             # (II)  p(i) and p(y) are not already allocated on the same truck run.
             # (III) Removing the trucks allocated to Q(i) and Q(j) and adding a truck to cover the load Q(i)+Q(j)
             #       does not cause the trucks allocated to exceed the trucks available
             #
-
-            added = False
-
             if routes[depot][i] > 0 and routes[depot][j] > 0:
                 if allocations[i] != allocations[j]:
                     vehicle_a = allocations[i]
@@ -143,19 +140,15 @@ def solve(data, vehicles):
                     vehicle_b_remaind_demand = vehicles_remaining_demand[vehicle_b]
 
                     if can_add(data, j, vehicle_a_remaind_demand):
-                        added = add_node(data, allocations, j, vehicle_a, vehicles_run, vehicles_remaining_demand)
+                        add_node(data, allocations, j, vehicle_a, vehicles_run, vehicles_remaining_demand)
                         routes[i][j] = 1
                         routes[depot][i] = 1
                         routes[depot][j] = 1
-                        print 'Adding j to i vehicle'
                     elif can_add(data, i, vehicle_b_remaind_demand):
-                        added = add_node(data, allocations, i, vehicle_b, vehicles_run, vehicles_remaining_demand)
+                        add_node(data, allocations, i, vehicle_b, vehicles_run, vehicles_remaining_demand)
                         routes[i][j] = 1
                         routes[depot][i] = 1
                         routes[depot][j] = 1
-                        print 'Adding i to j vehicle'
-
-            print added
 
     print 'vehicles_run', vehicles_run
 

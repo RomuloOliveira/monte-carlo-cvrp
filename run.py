@@ -22,7 +22,7 @@ def main():
     util.print_upper_triangular_matrix(data['MATRIX'])
 
     print 'SAVINGS LIST MATRIX'
-    util.print_upper_triangular_matrix(savings_list)
+    print savings_list
 
     print 'ROUTING MATRIX'
     util.print_upper_triangular_matrix(routes)
