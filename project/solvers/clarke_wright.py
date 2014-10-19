@@ -27,7 +27,7 @@ def compute_savings_list(data):
 
     A saving list is a matrix containing the saving amount S between i and j
 
-    S is calculated by S = d(0,i + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
+    S is calculated by S = d(0,i) + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
     """
 
     depot = data['DEPOT']
