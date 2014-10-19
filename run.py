@@ -21,6 +21,9 @@ def main():
     print 'DISTANCE MATRIX'
     util.print_upper_triangular_matrix(data['MATRIX'])
 
+    print 'COMPLETE MATRIX'
+    util.print_upper_triangular_matrix_as_complete(data['MATRIX'])
+
     print 'SAVINGS LIST MATRIX'
     print savings_list
 
