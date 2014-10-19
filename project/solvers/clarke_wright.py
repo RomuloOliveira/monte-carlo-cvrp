@@ -58,8 +58,6 @@ def create_initial_routes(data, vehicles_run, vehicles_remaining_demand):
                 added = False
 
                 for vehicle_index in range(len(vehicles_run)):
-                    vehicle = vehicles_run[i]
-
                     if can_add(data, j, vehicles_remaining_demand[vehicle_index]):
                         added = add_node(data, allocation, j, vehicle_index, vehicles_run, vehicles_remaining_demand)
                         break
