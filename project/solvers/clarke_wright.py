@@ -3,9 +3,9 @@
 
 import operator
 
-def can_add(data, i, current):
-    """Returns true if a vehicle with demand `current` has capacity to serve `i`"""
-    demand = data['DEMAND'][i]
+def can_add(data, node_list, current):
+    """Returns true if a vehicle with demand `current` has capacity to serve `node_list`"""
+    demand = sum([data['DEMAND'][i] for i in node_list])
     capacity = data['CAPACITY']
 
     if current + demand <= capacity:
@@ -198,7 +198,7 @@ def solve(data, vehicles):
                 # Try to add to a route
                 fodeu_count = 0
                 for vehicle in range(vehicles):
-                    if can_add(data, i, vehicles_demand[vehicle]) and can_add(data, j, vehicles_demand[vehicle]):
+                    if can_add(data, [i, j], vehicles_demand[vehicle]):
                         add_node(data, allocations, i, vehicle, vehicles_run, vehicles_demand)
                         add_node(data, allocations, j, vehicle, vehicles_run, vehicles_demand)
                         exausted = True
@@ -226,7 +226,7 @@ def solve(data, vehicles):
 
                 if vehicles_run[allocations[inserted]].index(inserted) == 0 or vehicles_run[allocations[inserted]].index(inserted) == len(vehicles_run[allocations[inserted]]) - 1: # i not interior
                     print '{} is not interior'.format(inserted)
-                    if can_add(data, to_insert, vehicles_demand[allocations[inserted]]):
+                    if can_add(data, [to_insert], vehicles_demand[allocations[inserted]]):
 
                         append = False
 
