@@ -185,7 +185,8 @@ def _parse_tsplib(f):
             break
 
     if len(specs) != len(used_specs):
-        raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(set(used_specs) - set(specs)))
+        missing_specs = set(used_specs).symmetric_difference(set(specs))
+        raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
 
     _post_process_specs(specs)
 
@@ -204,7 +205,7 @@ def _parse_tsplib(f):
             break
 
     if len(specs) != len(used_specs) + len(used_data):
-        missing_specs = set(specs) - (set(used_specs) + set(used_data))
+        missing_specs = set(specs).symmetric_difference(set(used_specs).union(set(used_data)))
         raise ParseException('Error parsing TSPLIB data: specs {} missing'.format(missing_specs))
 
     _post_process_data(specs)
