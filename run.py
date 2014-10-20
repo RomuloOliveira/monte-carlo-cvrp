@@ -16,7 +16,7 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    vehicles_run, savings_list  = clarke_wright.solve(data, vehicles)
+    vehicles_run, savings_list = clarke_wright.solve(data, vehicles)
 
     print 'DISTANCE MATRIX'
     util.print_upper_triangular_matrix(data['MATRIX'])

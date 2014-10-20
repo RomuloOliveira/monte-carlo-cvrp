@@ -32,8 +32,6 @@ def print_upper_triangular_matrix_as_complete(matrix):
     """Prints a CVRP data dict upper triangular matrix as a normal matrix
 
     Doesn't print header"""
-    count = sorted(matrix.keys())[0]
-
     for i in sorted(matrix.keys()):
         for j in sorted(matrix.keys()):
             a, b = i, j
