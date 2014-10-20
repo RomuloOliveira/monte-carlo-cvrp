@@ -3,9 +3,9 @@
 
 import operator
 
-def can_add(data, i, current):
-    """Returns true if a vehicle with demand `current` has capacity to serve `i`"""
-    demand = data['DEMAND'][i]
+def can_add(data, node_list, current):
+    """Returns true if a vehicle with demand `current` has capacity to serve `node_list`"""
+    demand = sum([data['DEMAND'][i] for i in node_list])
     capacity = data['CAPACITY']
 
     if current + demand <= capacity:
@@ -13,7 +13,7 @@ def can_add(data, i, current):
 
     return False
 
-def add_node(data, allocation, i, vehicle, vehicles_run, vehicles_demand):
+def add_node(data, allocation, i, vehicle, vehicles_run, vehicles_demand, append=True):
     """Adds node `i` to vehicle `vehicle`
 
     Takes care of removing demand for one vehicle to another
@@ -29,52 +29,20 @@ def add_node(data, allocation, i, vehicle, vehicles_run, vehicles_demand):
         vehicles_demand[old_vehicle] = vehicles_demand[old_vehicle] - demand
         vehicles_run[old_vehicle].remove(i)
 
-        # Remove 0-nodes routes
-        if not vehicles_run[old_vehicle]:
-            del vehicles_demand[old_vehicle]
-            del vehicles_run[old_vehicle]
-
     vehicles_demand[vehicle] = vehicles_demand[vehicle] + demand
-    vehicles_run[vehicle].append(i)
     allocation[i] = vehicle
+
+    if append: # append
+        vehicles_run[vehicle].append(i)
+    else: # prepend
+        vehicles_run[vehicle].insert(0, i)
 
     return True
 
-
-def create_initial_routes(data, vehicles_run, vehicles_demand):
-    """Creates a list of initial routes
-
-    First, a route contains only two nodes: the depot and a node
-
-    Returns a tuple contaning the routing table and an allocation matrix (node -> vehicle)
-    """
-    routes = {}
-    allocation = {}
-
-    depot = data['DEPOT']
-
-    for i in data['MATRIX']:
-        routes[i] = {}
-
-        for j in data['MATRIX'][i]:
-            if i > j:
-                continue
-
-            if i == j:
-                continue
-
-            if i == depot:
-                vehicles_demand[j] = 0
-                vehicles_run[j] = []
-
-                add_node(data, allocation, j, j, vehicles_run, vehicles_demand)
-
-                routes[i][j] = 2
-            else:
-                routes[i][j] = 0
-
-    return routes, allocation
-
+def is_interior(route, allocations, node):
+    """Return True if `node` is interior, i.e., not adjascent to depot"""
+    return (route[allocations[node]].index(node) != 0 and
+            route[allocations[node]].index(node) != len(route[allocations[node]]) - 1)
 
 def compute_savings_list(data):
     """Compute Clarke and Wright savings list
@@ -114,40 +82,45 @@ def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
     savings_list = compute_savings_list(data)
 
-    vehicles_run = {}
-    vehicles_demand = {}
-
-    initial_routes, allocations = create_initial_routes(data, vehicles_run, vehicles_demand)
-    routes = initial_routes.copy()
-
-    print vehicles_run
-    print vehicles_demand
-
-    depot = data['DEPOT']
+    vehicles_run = [[] for _ in range(vehicles)]
+    vehicles_demand = [0 for _ in range(vehicles)]
+    allocations = {}
+    dimension = data['DIMENSION']
 
     for i, j in savings_list:
-        #
-        # (I)   t(0,i) and t(0, j) must be greater than zero.
-        # (II)  p(i) and p(y) are not already allocated on the same truck run.
-        # (III) Removing the trucks allocated to Q(i) and Q(j) and adding a truck to cover the load Q(i)+Q(j)
-        #       does not cause the trucks allocated to exceed the trucks available
-        #
-        if routes[depot][i] > 0 and routes[depot][j] > 0:
-            if allocations[i] != allocations[j]:
-                vehicle_a = allocations[i]
-                vehicle_b = allocations[j]
 
-                if can_add(data, j, vehicles_demand[vehicle_a]):
-                    add_node(data, allocations, j, vehicle_a, vehicles_run, vehicles_demand)
-                    routes[i][j] = 1
-                    routes[depot][i] = 1
-                    routes[depot][j] = 1
-                elif can_add(data, i, vehicles_demand[vehicle_b]):
-                    add_node(data, allocations, i, vehicle_b, vehicles_run, vehicles_demand)
-                    routes[i][j] = 1
-                    routes[depot][i] = 1
-                    routes[depot][j] = 1
+        if len(allocations) == dimension - 1: # All nodes in a route
+            break
 
-    print 'vehicles_run', vehicles_run
+        # Neither points are in a route
+        if i not in allocations and j not in allocations:
+            # Try to add the two nodes to a route
+            for vehicle in range(vehicles):
+                if can_add(data, [i, j], vehicles_demand[vehicle]):
+                    add_node(data, allocations, i, vehicle, vehicles_run, vehicles_demand)
+                    add_node(data, allocations, j, vehicle, vehicles_run, vehicles_demand)
+        # either i or j is allocated
+        elif (i in allocations and j not in allocations) or (j in allocations and i not in allocations):
+            inserted = None
+            to_insert = None
 
-    return routes, savings_list, [j for i, j in vehicles_run.items()]
+            if i in allocations:
+                inserted = i
+                to_insert = j
+            else:
+                inserted = j
+                to_insert = i
+
+            # inserted not interior
+            if not is_interior(vehicles_run, allocations, inserted):
+                if can_add(data, [to_insert], vehicles_demand[allocations[inserted]]):
+                    append = False
+
+                    inserted_index = vehicles_run[allocations[inserted]].index(inserted)
+
+                    if inserted_index == len(vehicles_run[allocations[inserted]]) - 1:
+                        append = True
+
+                    add_node(data, allocations, to_insert, allocations[inserted], vehicles_run, vehicles_demand, append)
+
+    return vehicles_run, savings_list

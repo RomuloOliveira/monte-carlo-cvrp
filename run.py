@@ -16,16 +16,16 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    routes, savings_list, vehicles_run = clarke_wright.solve(data, vehicles)
+    vehicles_run, savings_list = clarke_wright.solve(data, vehicles)
 
     print 'DISTANCE MATRIX'
     util.print_upper_triangular_matrix(data['MATRIX'])
 
+    print 'COMPLETE MATRIX'
+    util.print_upper_triangular_matrix_as_complete(data['MATRIX'])
+
     print 'SAVINGS LIST MATRIX'
     print savings_list
-
-    print 'ROUTING MATRIX'
-    util.print_upper_triangular_matrix(routes)
 
     print 'SOLUTIONS'
     total_cost = 0

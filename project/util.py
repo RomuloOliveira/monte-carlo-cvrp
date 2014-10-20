@@ -28,6 +28,20 @@ def print_upper_triangular_matrix(matrix):
 
         indent_count = indent_count + 1
 
+def print_upper_triangular_matrix_as_complete(matrix):
+    """Prints a CVRP data dict upper triangular matrix as a normal matrix
+
+    Doesn't print header"""
+    for i in sorted(matrix.keys()):
+        for j in sorted(matrix.keys()):
+            a, b = i, j
+            if a > b:
+                a, b = b, a
+
+            print matrix[a][b],
+
+        print
+
 def solution_length(data, solution):
     """Returns the solution length cost
 
