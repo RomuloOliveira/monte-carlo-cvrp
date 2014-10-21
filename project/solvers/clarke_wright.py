@@ -8,47 +8,6 @@ from project import models
 class ClarkeWrightSolution(BaseSolution):
     pass
 
-def can_add(data, node_list, current):
-    """Returns true if a vehicle with demand `current` has capacity to serve `node_list`"""
-    demand = sum([data['DEMAND'][i] for i in node_list])
-    capacity = data['CAPACITY']
-
-    if current + demand <= capacity:
-        return True
-
-    return False
-
-def add_node(data, allocation, i, vehicle, vehicles_run, vehicles_demand, append=True):
-    """Adds node `i` to vehicle `vehicle`
-
-    Takes care of removing demand for one vehicle to another
-    """
-    demand = data['DEMAND'][i]
-
-    #
-    # Removes demand from old vehicle
-    #
-    if i in allocation:
-        old_vehicle = allocation[i]
-
-        vehicles_demand[old_vehicle] = vehicles_demand[old_vehicle] - demand
-        vehicles_run[old_vehicle].remove(i)
-
-    vehicles_demand[vehicle] = vehicles_demand[vehicle] + demand
-    allocation[i] = vehicle
-
-    if append: # append
-        vehicles_run[vehicle].append(i)
-    else: # prepend
-        vehicles_run[vehicle].insert(0, i)
-
-    return True
-
-def is_interior(route, allocations, node):
-    """Return True if `node` is interior, i.e., not adjascent to depot"""
-    return (route[allocations[node]].index(node) != 0 and
-            route[allocations[node]].index(node) != len(route[allocations[node]]) - 1)
-
 def compute_savings_list(data):
     """Compute Clarke and Wright savings list
 
