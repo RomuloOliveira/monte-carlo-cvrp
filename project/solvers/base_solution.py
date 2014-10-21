@@ -7,6 +7,8 @@ class BaseSolution(object):
     def process(self, pair):
         """Processes a pair of nodes into the current solution
 
+        MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
+
         Returns a new instance (deep copy) of self object
         """
         raise NotImplementedError()

@@ -6,7 +6,87 @@ from project.solvers.base_solution import BaseSolution
 from project import models
 
 class ClarkeWrightSolution(BaseSolution):
-    pass
+    """Class for a Clarke and Wright Savings algorithm"""
+
+    def __init__(self, cvrp_problem, vehicles):
+        """Initialize class
+
+        Parameters:
+            cvrp_problem: CVRPData instance
+            vehicles: Vehicles number
+        """
+        self._routes = [models.Route(cvrp_problem.capacity()) for _ in range(vehicles)]
+        self._problem = cvrp_problem
+        self._allocated = 0
+
+    def process(self, pair):
+        """Processes a pair of nodes into the current solution
+
+        MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
+
+        Returns a new instance (deep copy) of self object
+        """
+        i, j = pair
+
+        if i.route_allocation() is None and j.route_allocation() is None:
+            # Try to add the two nodes to a route
+            for route in self._routes:
+                if route.can_allocate([i, j]):
+                    route.allocate([i, j])
+                    self._allocated = self._allocated + 2
+                    break
+        # either i or j is allocated
+        elif (i.route_allocation() is not None and j.route_allocation() is None) or (j.route_allocation() is not None and i.route_allocation() is None):
+            inserted = None
+            to_insert = None
+
+            if i.route_allocation() is not None:
+                inserted = i
+                to_insert = j
+            else:
+                inserted = j
+                to_insert = i
+
+            route = inserted.route_allocation()
+
+            # inserted not interior
+            if not route.is_interior(inserted):
+                if route.can_allocate([to_insert]):
+                    append = False
+
+                    if route.last(inserted):
+                        append = True
+
+                    route.allocate([to_insert], append)
+                    self._allocated = self._allocated + 1
+
+    def can_process(self, pairs):
+        """Returns True if this solution can process `pairs`
+
+        Parameters:
+            pairs: List of pairs
+        """
+        i, j = pairs
+
+        if self._allocated == len(list(self._problem.nodes())) - 1: # All nodes in a route
+            return False
+
+        # Neither points are in a route
+        if i.route_allocation() is None or j.route_allocation() is None:
+            return True
+
+    def routes(self):
+        """Returns a generator for iterating over solution routes"""
+        for r in self._routes:
+            yield r
+
+    def length(self):
+        """Returns the solution length (or cost)"""
+        length = 0
+        for r in self._routes:
+            length = length + self._problem.length(r)
+
+        return length
 
 def compute_savings_list(data):
     """Compute Clarke and Wright savings list
@@ -36,44 +116,11 @@ def solve(data, vehicles):
 
     savings_list = compute_savings_list(data)
 
-    routes = [models.Route(data.capacity()) for _ in range(vehicles)]
+    solution = ClarkeWrightSolution(data, vehicles)
 
     allocated = 0
     for i, j in savings_list:
-        if allocated == len(nodes) - 1: # All nodes in a route
-            break
+        if solution.can_process((i, j)):
+            solution.process((i, j))
 
-        # Neither points are in a route
-        if i.route_allocation() is None and j.route_allocation() is None:
-            # Try to add the two nodes to a route
-            for route in routes:
-                if route.can_allocate([i, j]):
-                    route.allocate([i, j])
-                    allocated = allocated + 2
-                    break
-        # either i or j is allocated
-        elif (i.route_allocation() is not None and j.route_allocation() is None) or (j.route_allocation() is not None and i.route_allocation() is None):
-            inserted = None
-            to_insert = None
-
-            if i.route_allocation() is not None:
-                inserted = i
-                to_insert = j
-            else:
-                inserted = j
-                to_insert = i
-
-            route = inserted.route_allocation()
-
-            # inserted not interior
-            if not route.is_interior(inserted):
-                if route.can_allocate([to_insert]):
-                    append = False
-
-                    if route.last(inserted):
-                        append = True
-
-                    route.allocate([to_insert], append)
-                    allocated = allocated + 1
-
-    return routes, savings_list
+    return list(solution.routes()), savings_list
