@@ -21,6 +21,10 @@ class BaseSolution(object):
         """
         raise NotImplementedError()
 
+    def clone(self):
+        """Returns a deep copy of self"""
+        raise NotImplementedError()
+
     def routes(self):
         """Returns a generator for iterating over solution routes"""
         raise NotImplementedError()
