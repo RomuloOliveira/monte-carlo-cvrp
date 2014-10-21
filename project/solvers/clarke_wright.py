@@ -17,7 +17,21 @@ class ClarkeWrightSolution(BaseSolution):
         """
         self._routes = [models.Route(cvrp_problem.capacity()) for _ in range(vehicles)]
         self._problem = cvrp_problem
+        self._nodes = { x.name():x for x in cvrp_problem.nodes() }
         self._allocated = 0
+
+    def get_pair(self, pair):
+        return pair
+
+    def clone(self):
+        """Returns a deep copy of self
+
+        Clones:
+            routes
+            allocation
+            nodes
+        """
+        return self
 
     def process(self, pair):
         """Processes a pair of nodes into the current solution
@@ -26,14 +40,18 @@ class ClarkeWrightSolution(BaseSolution):
 
         Returns a new instance (deep copy) of self object
         """
-        i, j = pair
+        a, b = pair
+
+        new_solution = self.clone()
+
+        i, j = new_solution.get_pair((a, b))
 
         if i.route_allocation() is None and j.route_allocation() is None:
             # Try to add the two nodes to a route
-            for route in self._routes:
+            for route in new_solution._routes:
                 if route.can_allocate([i, j]):
                     route.allocate([i, j])
-                    self._allocated = self._allocated + 2
+                    new_solution._allocated = new_solution._allocated + 2
                     break
         # either i or j is allocated
         elif (i.route_allocation() is not None and j.route_allocation() is None) or (j.route_allocation() is not None and i.route_allocation() is None):
@@ -58,7 +76,9 @@ class ClarkeWrightSolution(BaseSolution):
                         append = True
 
                     route.allocate([to_insert], append)
-                    self._allocated = self._allocated + 1
+                    new_solution._allocated = new_solution._allocated + 1
+
+        return new_solution
 
     def can_process(self, pairs):
         """Returns True if this solution can process `pairs`

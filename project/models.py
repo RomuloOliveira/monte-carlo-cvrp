@@ -165,7 +165,7 @@ class CVRPData(object):
     def nodes(self):
         """Returns a generator for iterating over nodes"""
         for i in sorted(self._nodes):
-            yield i
+            yield self._nodes[i]
 
     def edges(self):
         """Returns a generator for iterating over edges"""
