@@ -147,7 +147,7 @@ def compute_savings_list(data):
 
 def simulation(solution, savings_list):
     """Do a Monte Carlo Simulation"""
-    pass
+    return 0
 
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
@@ -157,6 +157,16 @@ def solve(data, vehicles):
 
     for i, j in savings_list:
         if solution.can_process((i, j)):
-            solution = solution.process((i, j))
+            processed = solution.process((i, j))
+
+            yes = 0
+            no = 0
+
+            for r in range(1000): # simulations
+                yes = yes + simulation(processed, savings_list[:])
+                no = no + simulation(solution, savings_list[:])
+
+            if yes >= no:
+                solution = processed
 
     return list(solution.routes()), savings_list
