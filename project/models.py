@@ -23,6 +23,33 @@ class Vehicle(object):
         """Returns the current vehicle demand"""
         return self._demand
 
+    def can_allocate(self, nodes):
+        """Returns True if this vehicle can allocate nodes in `nodes` list"""
+        nodes_demand = sum([node.demand() for node in nodes])
+
+        if self._demand + nodes_demand <= self._capacity:
+            return True
+
+        return False
+
+    def allocate(self, nodes):
+        """Allocates all nodes from `nodes` list in this vehicle"""
+        if self.can_allocate(nodes) == False:
+            raise Exception('Trying to allocate more than vehicle capacity')
+
+        nodes_demand = sum([node.demand() for node in nodes])
+
+        self._demand = self._demand + nodes_demand
+
+    def deallocate(self, nodes):
+        """Deallocates all nodes from `nodes` list from this vehicle"""
+        nodes_demand = sum([node.demand() for node in nodes])
+
+        self._demand = self._demand - nodes_demand
+
+        if self._demand < 0:
+            raise Exception('Trying to deallocate more than previously allocated')
+
 class Node(object):
     """Class for modelling a CVRP node"""
 
@@ -53,7 +80,11 @@ class Node(object):
 
     def allocate(self, vehicle):
         """Allocates the current node into `vehicle`"""
-        raise NotImplementedError()
+        if self._allocation:
+            self._allocation.deallocate(self)
+
+        vehicle.allocate(self)
+        self._allocation = vehicle
 
     def __str__(self):
         return str(self._name)
@@ -78,7 +109,6 @@ class CVRPData(object):
         for i in data['MATRIX']:
 
             x = Node(i, data['DEMAND'][i])
-
             self._matrix[x] = {}
 
             for j in data['MATRIX']:
