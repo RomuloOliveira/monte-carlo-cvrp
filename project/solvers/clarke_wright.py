@@ -145,6 +145,10 @@ def compute_savings_list(data):
 
     return [nodes for nodes, saving in sorted_savings_list]
 
+def simulation(solution, savings_list):
+    """Do a Monte Carlo Simulation"""
+    pass
+
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
     savings_list = compute_savings_list(data)
