@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import operator
+import random
+
 from project.solvers.base_solution import BaseSolution
 from project import models
 
@@ -145,9 +147,15 @@ def compute_savings_list(data):
 
     return [nodes for nodes, saving in sorted_savings_list]
 
-def simulation(solution, savings_list):
+def simulation(solution, pair, savings_list):
     """Do a Monte Carlo Simulation"""
-    return 0
+
+    for i, j in savings_list:
+        if random.random() > 0.5:
+            if solution.can_process((i, j)):
+                solution = solution.process((i, j))
+
+    return solution.length()
 
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
@@ -162,11 +170,11 @@ def solve(data, vehicles):
             yes = 0
             no = 0
 
-            for r in range(1000): # simulations
-                yes = yes + simulation(processed, savings_list[:])
-                no = no + simulation(solution, savings_list[:])
+            for r in range(50): # simulations
+                yes = yes + simulation(processed, (i, j), savings_list[:])
+                no = no + simulation(solution, (i, j), savings_list[:])
 
-            if yes >= no:
+            if yes < no:
                 solution = processed
 
     return list(solution.routes()), savings_list
