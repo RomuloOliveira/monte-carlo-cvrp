@@ -19,13 +19,10 @@ class BaseSolution(object):
         """
         raise NotImplementedError()
 
-    def nodes(self):
-        """Returns a generator for iterating over nodes"""
-        raise NotImplementedError()
-
-    def egdes(self):
-        """Returns a generator for iterating over edges"""
+    def routes(self):
+        """Returns a generator for iterating over solution routes"""
         raise NotImplementedError()
 
     def length(self):
         """Returns the solution length (or cost)"""
+        raise NotImplementedError()
