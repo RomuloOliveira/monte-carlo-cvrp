@@ -5,6 +5,7 @@ import re
 import math
 
 from os import path
+from project.models import CVRPData
 
 class ParseException(Exception):
     """Exception raised when something unexpected occurs in a TSPLIB file parsing"""
@@ -306,4 +307,4 @@ def read_file(filename):
     if specs['TYPE'] != 'CVRP':
         raise Exception('Not a CVRP TSPLIB problem. Found: {}'.format(specs['TYPE']))
 
-    return specs
+    return CVRPData(specs)
