@@ -3,7 +3,7 @@
 
 import sys
 
-from project import data_input, util
+from project import data_input
 from project.solvers import clarke_wright
 
 def usage():
@@ -17,12 +17,6 @@ def main():
     vehicles = int(sys.argv[2])
 
     routes, savings_list = clarke_wright.solve(data, vehicles)
-
-    # print 'DISTANCE MATRIX'
-    # util.print_upper_triangular_matrix(data['MATRIX'])
-
-    # print 'COMPLETE MATRIX'
-    # util.print_upper_triangular_matrix_as_complete(data['MATRIX'])
 
     print 'SAVINGS LIST MATRIX'
     print savings_list

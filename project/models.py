@@ -40,7 +40,7 @@ class Route(object):
 
     def allocate(self, nodes, append=True):
         """Allocates all nodes from `nodes` list in this route"""
-        if self.can_allocate(nodes) == False:
+        if not self.can_allocate(nodes):
             raise Exception('Trying to allocate more than route capacity')
 
         nodes_demand = 0
@@ -138,7 +138,7 @@ class CVRPData(object):
         Parameters:
             data: TSPLIB parsed data
         """
-        self._nodes = { i:Node(i, data['DEMAND'][i]) for i in data['MATRIX'] }
+        self._nodes = {i: Node(i, data['DEMAND'][i]) for i in data['MATRIX']}
         self._matrix = {}
         self._capacity = data['CAPACITY']
         self._depot = None

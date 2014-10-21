@@ -17,7 +17,7 @@ class ClarkeWrightSolution(BaseSolution):
         """
         self._routes = [models.Route(cvrp_problem.capacity()) for _ in range(vehicles)]
         self._problem = cvrp_problem
-        self._nodes = { x.name(): models.Node(x.name(), x.demand()) for x in cvrp_problem.nodes() }
+        self._nodes = {x.name(): models.Node(x.name(), x.demand()) for x in cvrp_problem.nodes()}
         self._allocated = 0
 
     def get_pair(self, pair):
@@ -66,7 +66,8 @@ class ClarkeWrightSolution(BaseSolution):
                     new_solution._allocated = new_solution._allocated + 2
                     break
         # either i or j is allocated
-        elif (i.route_allocation() is not None and j.route_allocation() is None) or (j.route_allocation() is not None and i.route_allocation() is None):
+        elif ((i.route_allocation() is not None and j.route_allocation() is None) or
+                (j.route_allocation() is not None and i.route_allocation() is None)):
             inserted = None
             to_insert = None
 
@@ -144,13 +145,10 @@ def compute_savings_list(data):
 
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
-    nodes = list(data.nodes())
-
     savings_list = compute_savings_list(data)
 
     solution = ClarkeWrightSolution(data, vehicles)
 
-    allocated = 0
     for i, j in savings_list:
         if solution.can_process((i, j)):
             solution = solution.process((i, j))
