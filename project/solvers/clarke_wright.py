@@ -101,12 +101,14 @@ class ClarkeWrightSolution(BaseSolution):
         """
         i, j = pairs
 
-        if self._allocated == len(list(self._problem.nodes())) - 1: # All nodes in a route
-            return False
-
         # Neither points are in a route
         if i.route_allocation() is None or j.route_allocation() is None:
             return True
+
+        if self._allocated == len(list(self._problem.nodes())) - 1: # All nodes in a route
+            return False
+
+        return False
 
     def routes(self):
         """Returns a generator for iterating over solution routes"""
