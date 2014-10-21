@@ -1,30 +1,36 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
-class Vehicle(object):
-    """Class for modelling a CVRP vehicle"""
+class Route(object):
+    """Class for modelling a CVRP route"""
 
     def __init__(self, capacity):
         """Class constructor
 
-        Initialize vehicle capacity
+        Initialize route capacity
 
         Parameters:
-            capacity: vehicle capacity
+            capacity: route capacity
         """
         self._capacity = capacity
         self._demand = 0
+        self._nodes = []
 
     def capacity(self):
-        """Returns the vehicle capacity"""
+        """Returns the route capacity"""
         return self._capacity
 
     def demand(self):
-        """Returns the current vehicle demand"""
+        """Returns the current route demand"""
         return self._demand
 
+    def nodes(self):
+        """Returns a generator for iterating over nodes"""
+        for node in self._nodes:
+            yield node
+
     def can_allocate(self, nodes):
-        """Returns True if this vehicle can allocate nodes in `nodes` list"""
+        """Returns True if this route can allocate nodes in `nodes` list"""
         nodes_demand = sum([node.demand() for node in nodes])
 
         if self._demand + nodes_demand <= self._capacity:
@@ -32,23 +38,51 @@ class Vehicle(object):
 
         return False
 
-    def allocate(self, nodes):
-        """Allocates all nodes from `nodes` list in this vehicle"""
+    def allocate(self, nodes, append=True):
+        """Allocates all nodes from `nodes` list in this route"""
         if self.can_allocate(nodes) == False:
-            raise Exception('Trying to allocate more than vehicle capacity')
+            raise Exception('Trying to allocate more than route capacity')
 
-        nodes_demand = sum([node.demand() for node in nodes])
+        nodes_demand = 0
+        for node in nodes:
+            if node._allocation:
+                node._allocation.deallocate([node])
+
+            node._allocation = self
+            nodes_demand = nodes_demand + node.demand()
+            if append:
+                self._nodes.append(node)
+            else:
+                self._nodes.insert(0, node)
 
         self._demand = self._demand + nodes_demand
 
     def deallocate(self, nodes):
-        """Deallocates all nodes from `nodes` list from this vehicle"""
-        nodes_demand = sum([node.demand() for node in nodes])
+        """Deallocates all nodes from `nodes` list from this route"""
+        nodes_demand = 0
+        for node in nodes:
+            self._nodes.remove(node)
+            node._allocation = None
+            nodes_demand = nodes_demand + node.demand()
 
         self._demand = self._demand - nodes_demand
 
         if self._demand < 0:
             raise Exception('Trying to deallocate more than previously allocated')
+
+    def is_interior(self, node):
+        """Returns True if node is interior to the route, i.e., not adjascent to depot"""
+        return self._nodes.index(node) != 0 and self._nodes.index(node) != len(self._nodes) - 1
+
+    def last(self, node):
+        """Returns True if node is the last node in the route"""
+        return self._nodes.index(node) == len(self._nodes) - 1
+
+    def __str__(self):
+        return str(self._nodes)
+
+    def __repr__(self):
+        return str(self._nodes)
 
 class Node(object):
     """Class for modelling a CVRP node"""
@@ -74,17 +108,9 @@ class Node(object):
         """Returns the node demand"""
         return self._demand
 
-    def vehicle_allocation(self):
-        """Returns the vehicle which node is allocated"""
+    def route_allocation(self):
+        """Returns the route which node is allocated"""
         return self._allocation
-
-    def allocate(self, vehicle):
-        """Allocates the current node into `vehicle`"""
-        if self._allocation:
-            self._allocation.deallocate(self)
-
-        vehicle.allocate(self)
-        self._allocation = vehicle
 
     def __str__(self):
         return str(self._name)
@@ -92,47 +118,92 @@ class Node(object):
     def __repr__(self):
         return str(self._name)
 
+    def __cmp__(self, other):
+        if isinstance(other, Node):
+            return self._name - other._name
+
+        return self._name - other
+
+    def __hash__(self):
+        return self._name.__hash__()
+
 class CVRPData(object):
     """Class for modelling a CVRP problem data"""
 
     def __init__(self, data):
         """Class constructor
 
-        Initialize all nodes, edges and vehicles
+        Initialize all nodes, edges and depot
 
         Parameters:
             data: TSPLIB parsed data
         """
+        self._nodes = { i:Node(i, data['DEMAND'][i]) for i in data['MATRIX'] }
         self._matrix = {}
         self._capacity = data['CAPACITY']
+        self._depot = None
 
         for i in data['MATRIX']:
 
-            x = Node(i, data['DEMAND'][i])
+            x = self._nodes[i]
             self._matrix[x] = {}
+
+            if i == data['DEPOT']:
+                self._depot = x # x, not i!!
 
             for j in data['MATRIX']:
                 if i > j:
                     continue
 
-                y = Node(j, data['DEMAND'][j])
+                y = self._nodes[j]
 
                 self._matrix[x][y] = data['MATRIX'][i][j]
 
+        if self._depot is None:
+            raise Exception('Depot not found')
+
     def nodes(self):
         """Returns a generator for iterating over nodes"""
-        for i in sorted(self._matrix):
+        for i in sorted(self._nodes):
             yield i
 
     def edges(self):
         """Returns a generator for iterating over edges"""
         for i in sorted(self._matrix.keys()):
-            for j in sorted(self._matrix[i]):
-                yield (i, j)
+            for j in sorted(self._matrix[i].keys()):
+                if i != j:
+                    yield (i, j)
+
+    def depot(self):
+        """Returns the depot node"""
+        return self._depot
 
     def distance(self, i, j):
         """Returns the distance between node i and node j"""
-        return self._matrix[i][j]
+        a, b = i, j
+
+        if a.name > b.name:
+            a, b = b, a
+
+        return self._matrix[a][b]
+
+    def length(self, route):
+        """Returns the length (cost) of route"""
+        cost = 0
+        depot = self._depot
+
+        last = depot
+        for i in route.nodes():
+            a, b = last, i
+            if a > b:
+                a, b = b, a
+
+            cost = cost + self._matrix[a][b]
+            last = i
+
+        cost = cost + self._matrix[depot][last]
+
+        return cost
 
     def capacity(self):
         """Returns vehicles capacity"""
