@@ -17,11 +17,12 @@ class ClarkeWrightSolution(BaseSolution):
         """
         self._routes = [models.Route(cvrp_problem.capacity()) for _ in range(vehicles)]
         self._problem = cvrp_problem
-        self._nodes = { x.name():x for x in cvrp_problem.nodes() }
+        self._nodes = { x.name(): models.Node(x.name(), x.demand()) for x in cvrp_problem.nodes() }
         self._allocated = 0
 
     def get_pair(self, pair):
-        return pair
+        i, j = pair
+        return (self._nodes[i], self._nodes[j])
 
     def clone(self):
         """Returns a deep copy of self
@@ -31,7 +32,17 @@ class ClarkeWrightSolution(BaseSolution):
             allocation
             nodes
         """
-        return self
+
+        new_solution = ClarkeWrightSolution(self._problem, len(self._routes))
+
+        # Clona as rotas
+        for index, r in enumerate(self._routes):
+            new_route = new_solution._routes[index]
+            for node in r.nodes():
+                new_node = new_solution._nodes[node]
+                new_route.allocate([new_node])
+
+        return new_solution
 
     def process(self, pair):
         """Processes a pair of nodes into the current solution
@@ -141,6 +152,6 @@ def solve(data, vehicles):
     allocated = 0
     for i, j in savings_list:
         if solution.can_process((i, j)):
-            solution.process((i, j))
+            solution = solution.process((i, j))
 
     return list(solution.routes()), savings_list
