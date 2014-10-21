@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import operator
+from project.solvers.base_solution import BaseSolution
+from project import models
+
+class ClarkeWrightSolution(BaseSolution):
+    pass
 
 def can_add(data, node_list, current):
     """Returns true if a vehicle with demand `current` has capacity to serve `node_list`"""
@@ -52,27 +57,15 @@ def compute_savings_list(data):
     S is calculated by S = d(0,i) + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
     """
 
-    depot = data['DEPOT']
-
     savings_list = {}
 
-    for i in data['MATRIX']:
-        if i == depot:
+    for i, j in data.edges():
+        t = (i, j)
+
+        if i == data.depot() or j == data.depot():
             continue
 
-        for j in data['MATRIX']:
-            if j == depot:
-                continue
-
-            if i > j: # upper triangular matrix
-                continue
-
-            if i == j:
-                continue
-
-            t = (i, j)
-
-            savings_list[t] = data['MATRIX'][depot][i] + data['MATRIX'][depot][j] - data['MATRIX'][i][j]
+        savings_list[t] = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
 
     sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
 
@@ -80,47 +73,48 @@ def compute_savings_list(data):
 
 def solve(data, vehicles):
     """Solves the CVRP problem using Clarke and Wright Savings methods"""
+    nodes = list(data.nodes())
+
     savings_list = compute_savings_list(data)
 
-    vehicles_run = [[] for _ in range(vehicles)]
-    vehicles_demand = [0 for _ in range(vehicles)]
-    allocations = {}
-    dimension = data['DIMENSION']
+    routes = [models.Route(data.capacity()) for _ in range(vehicles)]
 
+    allocated = 0
     for i, j in savings_list:
-
-        if len(allocations) == dimension - 1: # All nodes in a route
+        if allocated == len(nodes) - 1: # All nodes in a route
             break
 
         # Neither points are in a route
-        if i not in allocations and j not in allocations:
+        if i.route_allocation() is None and j.route_allocation() is None:
             # Try to add the two nodes to a route
-            for vehicle in range(vehicles):
-                if can_add(data, [i, j], vehicles_demand[vehicle]):
-                    add_node(data, allocations, i, vehicle, vehicles_run, vehicles_demand)
-                    add_node(data, allocations, j, vehicle, vehicles_run, vehicles_demand)
+            for route in routes:
+                if route.can_allocate([i, j]):
+                    route.allocate([i, j])
+                    allocated = allocated + 2
+                    break
         # either i or j is allocated
-        elif (i in allocations and j not in allocations) or (j in allocations and i not in allocations):
+        elif (i.route_allocation() is not None and j.route_allocation() is None) or (j.route_allocation() is not None and i.route_allocation() is None):
             inserted = None
             to_insert = None
 
-            if i in allocations:
+            if i.route_allocation() is not None:
                 inserted = i
                 to_insert = j
             else:
                 inserted = j
                 to_insert = i
 
+            route = inserted.route_allocation()
+
             # inserted not interior
-            if not is_interior(vehicles_run, allocations, inserted):
-                if can_add(data, [to_insert], vehicles_demand[allocations[inserted]]):
+            if not route.is_interior(inserted):
+                if route.can_allocate([to_insert]):
                     append = False
 
-                    inserted_index = vehicles_run[allocations[inserted]].index(inserted)
-
-                    if inserted_index == len(vehicles_run[allocations[inserted]]) - 1:
+                    if route.last(inserted):
                         append = True
 
-                    add_node(data, allocations, to_insert, allocations[inserted], vehicles_run, vehicles_demand, append)
+                    route.allocate([to_insert], append)
+                    allocated = allocated + 1
 
-    return vehicles_run, savings_list
+    return routes, savings_list
