@@ -4,7 +4,7 @@
 class Route(object):
     """Class for modelling a CVRP route"""
 
-    def __init__(self, capacity):
+    def __init__(self, cvrp_problem, capacity):
         """Class constructor
 
         Initialize route capacity
@@ -12,6 +12,7 @@ class Route(object):
         Parameters:
             capacity: route capacity
         """
+        self._problem = cvrp_problem
         self._capacity = capacity
         self._demand = 0
         self._nodes = []
@@ -28,6 +29,25 @@ class Route(object):
         """Returns a generator for iterating over nodes"""
         for node in self._nodes:
             yield node
+
+    def length(self):
+        """Returns the route length (cost)"""
+        cost = 0
+        depot = self._problem.depot()
+
+        last = depot
+        for i in self._nodes:
+            a, b = last, i
+            if a > b:
+                a, b = b, a
+
+            cost = cost + self._problem.distance(a, b)
+            last = i
+
+        cost = cost + self._problem.distance(depot, last)
+
+        return cost
+
 
     def can_allocate(self, nodes):
         """Returns True if this route can allocate nodes in `nodes` list"""
@@ -186,24 +206,6 @@ class CVRPData(object):
             a, b = b, a
 
         return self._matrix[a][b]
-
-    def length(self, route):
-        """Returns the length (cost) of route"""
-        cost = 0
-        depot = self._depot
-
-        last = depot
-        for i in route.nodes():
-            a, b = last, i
-            if a > b:
-                a, b = b, a
-
-            cost = cost + self._matrix[a][b]
-            last = i
-
-        cost = cost + self._matrix[depot][last]
-
-        return cost
 
     def capacity(self):
         """Returns vehicles capacity"""
