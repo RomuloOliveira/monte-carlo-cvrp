@@ -42,24 +42,22 @@ def print_upper_triangular_matrix_as_complete(matrix):
 
         print
 
-def solution_length(data, solution):
-    """Returns the solution length cost
+def print_solution(solutions):
+    """Prints a solution
 
-    Solution is a list of node indexes
+    Solution is an instance of project.solvers.BaseSolution
+
+    Example:
+        SOLUTIONS
+        [8, 9, 10, 7]: 160
+        [5, 6]: 131
+        [3, 4, 2]: 154
+        Total cost: 445
     """
-
-    cost = 0
-    depot = data['DEPOT']
-
-    last = depot
-    for i in solution:
-        a, b = last, i
-        if a > b:
-            a, b = b, a
-
-        cost = cost + data['MATRIX'][a][b]
-        last = i
-
-    cost = cost + data['MATRIX'][depot][last]
-
-    return cost
+    print 'SOLUTIONS'
+    total_cost = 0
+    for solution in solutions:
+        cost = solution.length()
+        total_cost = total_cost + cost
+        print '{}: {}'.format(solution, cost)
+    print 'Total cost: {}'.format(total_cost)
