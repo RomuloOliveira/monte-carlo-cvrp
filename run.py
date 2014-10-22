@@ -19,25 +19,19 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    cws_solution = clarke_wright_solver.solve(data, vehicles)
-    binary_mcscws_solution = binary_mcscws_solver.solve(data, vehicles)
+    algorithms = [(clarke_wright_solver, 'ClarkeWrightSolver'), (binary_mcscws_solver, 'BinaryMCSCWSSolver')]
+    best_algorithm = None
+    best_solution = None
 
-    solutions = [(cws_solution, 'ClarkeWrightSolver'), (binary_mcscws_solution, 'BinaryMCSCWSSolver')]
-    valid_solutions = []
+    for solver, algorithm in algorithms:
+        solution = solver.solve(data, vehicles)
 
-    for solution, algorithm in solutions:
         if not solution.is_complete():
             print 'Solution from algorithm {} not a complete solution'.format(algorithm)
         else:
             print '{} solution:'.format(algorithm)
             util.print_solution(solution)
 
-            valid_solutions.append((solution, algorithm))
-
-    best_solution = None
-    best_algorithm = None
-
-    for solution, algorithm in solutions:
         if best_algorithm is None:
             best_algorithm = algorithm
 
