@@ -8,7 +8,7 @@ from project.solvers.base_solution import BaseSolution
 from project import models
 
 class ClarkeWrightSolution(BaseSolution):
-    """Class for a Clarke and Wright Savings algorithm"""
+    """Solution class for a Clarke and Wright Savings algorithm"""
 
     def __init__(self, cvrp_problem, vehicles):
         """Initialize class
@@ -17,7 +17,7 @@ class ClarkeWrightSolution(BaseSolution):
             cvrp_problem: CVRPData instance
             vehicles: Vehicles number
         """
-        self._routes = [models.Route(cvrp_problem.capacity()) for _ in range(vehicles)]
+        self._routes = [models.Route(cvrp_problem, cvrp_problem.capacity()) for _ in range(vehicles)]
         self._problem = cvrp_problem
         self._nodes = {x.name(): models.Node(x.name(), x.demand()) for x in cvrp_problem.nodes()}
         self._allocated = 0
@@ -25,6 +25,10 @@ class ClarkeWrightSolution(BaseSolution):
     def get_pair(self, pair):
         i, j = pair
         return (self._nodes[i], self._nodes[j])
+
+    def is_complete(self):
+        """Returns True if this is a complete solution, i.e, all nodes are allocated"""
+        return all([node.route_allocation() is not None for node in self._nodes.values() if node != self._problem.depot()])
 
     def clone(self):
         """Returns a deep copy of self
@@ -125,56 +129,45 @@ class ClarkeWrightSolution(BaseSolution):
 
         return length
 
-def compute_savings_list(data):
-    """Compute Clarke and Wright savings list
+class ClarkeWrightSolver(object):
+    """Clark and Wright Savings algorithm solver class"""
+    def compute_savings_list(self, data):
+        """Compute Clarke and Wright savings list
 
-    A saving list is a matrix containing the saving amount S between i and j
+        A saving list is a matrix containing the saving amount S between i and j
 
-    S is calculated by S = d(0,i) + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
-    """
+        S is calculated by S = d(0,i) + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
+        """
 
-    savings_list = {}
+        savings_list = {}
 
-    for i, j in data.edges():
-        t = (i, j)
+        for i, j in data.edges():
+            t = (i, j)
 
-        if i == data.depot() or j == data.depot():
-            continue
+            if i == data.depot() or j == data.depot():
+                continue
 
-        savings_list[t] = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
+            savings_list[t] = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
 
-    sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
 
-    return [nodes for nodes, saving in sorted_savings_list]
+        return [nodes for nodes, saving in sorted_savings_list]
 
-def simulation(solution, pair, savings_list):
-    """Do a Monte Carlo Simulation"""
+    def solve(self, data, vehicles):
+        """Solves the CVRP problem using Clarke and Wright Savings methods
 
-    for i, j in savings_list:
-        if random.random() > 0.5:
+        Parameters:
+            data: CVRPData instance
+            vehicles: Vehicles number
+
+        Returns list of routes
+        """
+        savings_list = self.compute_savings_list(data)
+
+        solution = ClarkeWrightSolution(data, vehicles)
+
+        for i, j in savings_list:
             if solution.can_process((i, j)):
                 solution = solution.process((i, j))
 
-    return solution.length()
-
-def solve(data, vehicles):
-    """Solves the CVRP problem using Clarke and Wright Savings methods"""
-    savings_list = compute_savings_list(data)
-
-    solution = ClarkeWrightSolution(data, vehicles)
-
-    for i, j in savings_list:
-        if solution.can_process((i, j)):
-            processed = solution.process((i, j))
-
-            yes = 0
-            no = 0
-
-            for r in range(50): # simulations
-                yes = yes + simulation(processed, (i, j), savings_list[:])
-                no = no + simulation(solution, (i, j), savings_list[:])
-
-            if yes < no:
-                solution = processed
-
-    return list(solution.routes()), savings_list
+        return list(solution.routes()), savings_list
