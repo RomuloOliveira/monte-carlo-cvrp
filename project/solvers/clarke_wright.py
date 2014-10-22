@@ -125,7 +125,7 @@ class ClarkeWrightSolution(BaseSolution):
         """Returns the solution length (or cost)"""
         length = 0
         for r in self._routes:
-            length = length + self._problem.length(r)
+            length = length + r.length()
 
         return length
 
