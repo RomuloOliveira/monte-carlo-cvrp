@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import operator
-import random
 
 from project.solvers.base_solution import BaseSolution
 from project import models
@@ -28,7 +27,9 @@ class ClarkeWrightSolution(BaseSolution):
 
     def is_complete(self):
         """Returns True if this is a complete solution, i.e, all nodes are allocated"""
-        return all([node.route_allocation() is not None for node in self._nodes.values() if node != self._problem.depot()])
+        return all(
+            [node.route_allocation() is not None for node in self._nodes.values() if node != self._problem.depot()]
+        )
 
     def clone(self):
         """Returns a deep copy of self

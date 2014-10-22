@@ -56,6 +56,6 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                     solution = processed
 
             if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
-               self._best = solution
+                self._best = solution
 
         return self._best
