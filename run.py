@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import time
 
 from project import data_input, util
 from project.solvers import clarke_wright, binary_mcscws
@@ -24,13 +25,19 @@ def main():
     best_solution = None
 
     for solver, algorithm in algorithms:
+        start = time.time()
+
         solution = solver.solve(data, vehicles)
+
+        elapsed = time.time() - start
 
         if not solution.is_complete():
             print 'Solution from algorithm {} not a complete solution'.format(algorithm)
         else:
             print '{} solution:'.format(algorithm)
             util.print_solution(solution)
+
+        print 'Elapsed time (seconds): {}'.format(elapsed)
 
         if best_algorithm is None:
             best_algorithm = algorithm
@@ -42,7 +49,8 @@ def main():
             best_solution = solution
             best_algorithm = algorithm
 
-    print
+        print
+
     print 'Best: {}'.format(best_algorithm)
 
 if __name__ == '__main__':
