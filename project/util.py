@@ -42,21 +42,19 @@ def print_upper_triangular_matrix_as_complete(matrix):
 
         print
 
-def print_solution(solutions):
+def print_solution(solution):
     """Prints a solution
 
     Solution is an instance of project.solvers.BaseSolution
 
     Example:
-        SOLUTIONS
         [8, 9, 10, 7]: 160
         [5, 6]: 131
         [3, 4, 2]: 154
         Total cost: 445
     """
-    print 'SOLUTIONS'
     total_cost = 0
-    for solution in solutions:
+    for solution in solution.routes():
         cost = solution.length()
         total_cost = total_cost + cost
         print '{}: {}'.format(solution, cost)
