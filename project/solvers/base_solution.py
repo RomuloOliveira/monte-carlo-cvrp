@@ -29,6 +29,10 @@ class BaseSolution(object):
         """Returns a generator for iterating over solution routes"""
         raise NotImplementedError()
 
+    def is_complete(self):
+        """Returns True if this is a complete solution, i.e, all nodes are allocated"""
+        raise NotImplementedError()
+
     def length(self):
         """Returns the solution length (or cost)"""
         raise NotImplementedError()
