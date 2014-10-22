@@ -48,7 +48,6 @@ class Route(object):
 
         return cost
 
-
     def can_allocate(self, nodes):
         """Returns True if this route can allocate nodes in `nodes` list"""
         nodes_demand = sum([node.demand() for node in nodes])
