@@ -35,7 +35,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
             data: CVRPData instance
             vehicles: Vehicles number
 
-        Returns list of routes
+        Returns a solution (BinaryMCSCWSSolution class))
         """
         savings_list = self.compute_savings_list(data)
 
@@ -59,4 +59,4 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
             if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
                self._best = solution
 
-        return list(self._best.routes()), savings_list
+        return self._best

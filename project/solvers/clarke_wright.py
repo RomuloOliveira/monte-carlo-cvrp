@@ -160,7 +160,7 @@ class ClarkeWrightSolver(object):
             data: CVRPData instance
             vehicles: Vehicles number
 
-        Returns list of routes
+        Returns a solution (ClarkeWrightSolution class))
         """
         savings_list = self.compute_savings_list(data)
 
@@ -170,4 +170,4 @@ class ClarkeWrightSolver(object):
             if solution.can_process((i, j)):
                 solution = solution.process((i, j))
 
-        return list(solution.routes()), savings_list
+        return solution
