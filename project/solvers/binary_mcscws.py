@@ -55,6 +55,9 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                     yes = yes + self.simulation(processed, (i, j), savings_list[:])
                     no = no + self.simulation(solution, (i, j), savings_list[:])
 
+                    if time.time() - start > timeout:
+                        break
+
                 if yes < no:
                     solution = processed
 
