@@ -3,7 +3,7 @@
 . bin/clean.sh
 . bin/build.sh
 
-files=`find -name '*.vrp'`
+files=`find -name '*.vrp' | sort`
 for i in $files
 do
     basename=`echo $i | sed 's/.*\/\(.*\).vrp/\1/'`
