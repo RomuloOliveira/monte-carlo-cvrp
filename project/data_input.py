@@ -243,7 +243,7 @@ def _parse_tsplib(f):
                 specs[s] = line.split('{} :'.format(s))[-1].strip() # get value data part
                 break
 
-        if s == 'EDGE_WEIGHT_TYPE' and specs[s] == 'EXPLICIT':
+        if s == 'EDGE_WEIGHT_TYPE' and s in specs and specs[s] == 'EXPLICIT':
             used_specs.append('EDGE_WEIGHT_FORMAT')
 
         # All specs read
