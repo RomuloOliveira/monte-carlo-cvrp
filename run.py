@@ -20,7 +20,7 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    timeout = 300.0
+    timeout = 15
 
     algorithms = [(clarke_wright_solver, 'ClarkeWrightSolver'), (binary_mcscws_solver, 'BinaryMCSCWSSolver')]
     best_algorithm = None
