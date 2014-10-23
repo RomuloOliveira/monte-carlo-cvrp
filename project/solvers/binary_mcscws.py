@@ -20,7 +20,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
 
         for i, j in savings_list:
             if solution.can_process((i, j)):
-                if random.random() > 0.2:
+                if random.random() > 0.4:
                     solution = solution.process((i, j))
 
         if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
