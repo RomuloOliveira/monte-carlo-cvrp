@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import time
 
 from project.solvers import clarke_wright
 
@@ -27,21 +28,27 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
 
         return solution.length()
 
-    def solve(self, data, vehicles):
+    def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using BinaryMCS-CWS method
 
         Parameters:
             data: CVRPData instance
             vehicles: Vehicles number
+            timeout: max processing time in seconds
 
         Returns a solution (BinaryMCSCWSSolution class))
         """
+        start = time.time()
         savings_list = self.compute_savings_list(data)
 
         solution = BinaryMCSCWSSolution(data, vehicles)
         self._best = solution
 
         for i, j in savings_list:
+
+            if time.time() - start > timeout:
+                break
+
             if solution.can_process((i, j)):
                 processed = solution.process((i, j))
 

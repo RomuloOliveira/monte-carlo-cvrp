@@ -3,7 +3,7 @@
 
 import operator
 
-from project.solvers.base_solution import BaseSolution
+from project.solvers.base import BaseSolution, BaseSolver
 from project import models
 
 class ClarkeWrightSolution(BaseSolution):
@@ -130,7 +130,7 @@ class ClarkeWrightSolution(BaseSolution):
 
         return length
 
-class ClarkeWrightSolver(object):
+class ClarkeWrightSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
     def compute_savings_list(self, data):
         """Compute Clarke and Wright savings list
@@ -154,12 +154,13 @@ class ClarkeWrightSolver(object):
 
         return [nodes for nodes, saving in sorted_savings_list]
 
-    def solve(self, data, vehicles):
+    def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using Clarke and Wright Savings methods
 
         Parameters:
             data: CVRPData instance
             vehicles: Vehicles number
+            timeout: max processing time in seconds
 
         Returns a solution (ClarkeWrightSolution class))
         """
