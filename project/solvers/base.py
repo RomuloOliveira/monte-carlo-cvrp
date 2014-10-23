@@ -36,3 +36,21 @@ class BaseSolution(object):
     def length(self):
         """Returns the solution length (or cost)"""
         raise NotImplementedError()
+
+
+class BaseSolver(object):
+    """Base algorithm solver class"""
+
+    def solve(self, data, vehicles, timeout):
+        """Must solves the CVRP problem
+
+        Parameters:
+            data: CVRPData instance
+            vehicles: Vehicles number
+            timeout: max processing time in seconds
+
+        Must return BEFORE timeout
+
+        Must returns a solution (BaseSolution class derived)
+        """
+        raise NotImplementedError()
