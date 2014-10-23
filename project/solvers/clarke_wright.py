@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import operator
+import time
 
 from project.solvers.base import BaseSolution, BaseSolver
 from project import models
@@ -168,8 +169,13 @@ class ClarkeWrightSolver(BaseSolver):
 
         solution = ClarkeWrightSolution(data, vehicles)
 
+        start = time.time()
+
         for i, j in savings_list:
             if solution.can_process((i, j)):
                 solution = solution.process((i, j))
+
+            if time.time() - start > timeout:
+                break
 
         return solution
