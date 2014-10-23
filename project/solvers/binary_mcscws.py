@@ -45,10 +45,6 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         self._best = solution
 
         for i, j in savings_list:
-
-            if time.time() - start > timeout:
-                break
-
             if solution.can_process((i, j)):
                 processed = solution.process((i, j))
 
@@ -64,5 +60,8 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
 
             if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
                 self._best = solution
+
+            if time.time() - start > timeout:
+                break
 
         return self._best
