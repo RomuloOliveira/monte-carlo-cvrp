@@ -1,17 +1,66 @@
 #!/bin/env python
 # -*- coding: utf-8 -*-
 
+from project import models
+
 class BaseSolution(object):
     """Base abstract class for a CVRP solution"""
 
-    def process(self, pair):
-        """Processes a pair of nodes into the current solution
+    def __init__(self, cvrp_problem, vehicles):
+        """Initialize class
 
-        MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
-
-        Returns a new instance (deep copy) of self object
+        Parameters:
+            cvrp_problem: CVRPData instance
+            vehicles: Vehicles number
         """
-        raise NotImplementedError()
+        self._routes = [models.Route(cvrp_problem, cvrp_problem.capacity()) for _ in range(vehicles)]
+        self._problem = cvrp_problem
+        self._nodes = {x.name(): models.Node(x.name(), x.demand()) for x in cvrp_problem.nodes()}
+        self._allocated = 0
+
+    def get_pair(self, pair):
+        i, j = pair
+        return (self._nodes[i], self._nodes[j])
+
+    def is_complete(self):
+        """Returns True if this is a complete solution, i.e, all nodes are allocated"""
+        return all(
+            [node.route_allocation() is not None for node in self._nodes.values() if node != self._problem.depot()]
+        )
+
+    def clone(self):
+        """Returns a deep copy of self
+
+        Clones:
+            routes
+            allocation
+            nodes
+        """
+
+        new_solution = self.__class__(self._problem, len(self._routes))
+
+        # Clone routes
+        for index, r in enumerate(self._routes):
+            new_route = new_solution._routes[index]
+            for node in r.nodes():
+                # Insere new node on new route
+                new_node = new_solution._nodes[node]
+                new_route.allocate([new_node])
+
+        return new_solution
+
+    def routes(self):
+        """Returns a generator for iterating over solution routes"""
+        for r in self._routes:
+            yield r
+
+    def length(self):
+        """Returns the solution length (or cost)"""
+        length = 0
+        for r in self._routes:
+            length = length + r.length()
+
+        return length
 
     def can_process(self, pairs):
         """Returns True if this solution can process `pairs`
@@ -21,20 +70,13 @@ class BaseSolution(object):
         """
         raise NotImplementedError()
 
-    def clone(self):
-        """Returns a deep copy of self"""
-        raise NotImplementedError()
+    def process(self, pair):
+        """Processes a pair of nodes into the current solution
 
-    def routes(self):
-        """Returns a generator for iterating over solution routes"""
-        raise NotImplementedError()
+        MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
 
-    def is_complete(self):
-        """Returns True if this is a complete solution, i.e, all nodes are allocated"""
-        raise NotImplementedError()
-
-    def length(self):
-        """Returns the solution length (or cost)"""
+        Returns a new instance (deep copy) of self object
+        """
         raise NotImplementedError()
 
 
