@@ -3,6 +3,7 @@
 
 import random
 import time
+import sys
 
 from project.solvers import clarke_wright
 
@@ -48,6 +49,8 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         solution = BinaryMCSCWSSolution(data, vehicles)
         self._best = None
 
+        savings_copy = savings_list[:]
+
         while savings_list:
             i, j = savings_list.pop(0)
 
@@ -60,18 +63,18 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 if not inserted:
                     continue
 
-                minimum_yes = 9999999
-                minimum_no = 9999999
+                minimum_yes = sys.maxsize
+                minimum_no = sys.maxsize
 
-                for r in range(50): # simulations
-                    length, complete = self.simulation(processed.clone(), (i, j), savings_list)
+                for r in range(25): # simulations
+                    length, complete = self.simulation(processed.clone(), (i, j), savings_copy)
 
                     if complete:
                         if length < minimum_yes:
                             minimum_yes = length
 
 
-                    length, complete = self.simulation(solution.clone(), (i, j), savings_list)
+                    length, complete = self.simulation(solution.clone(), (i, j), savings_copy)
 
                     if complete:
                         if length < minimum_no:
@@ -80,23 +83,11 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                     if time.time() - start > timeout:
                         break
 
-                print 'minimum_yes', minimum_yes
-                print 'minimum_no', minimum_no
-
                 if minimum_yes <= minimum_no:
-                    print 'yes'
                     solution = processed
-                else:
-                    print 'no'
-
-                print self._best.length()
-
-                print
 
             if time.time() - start > timeout:
                 break
-
-        print 'Constructed solution {}. Complete? {}'.format(solution.length(), solution.is_complete())
 
         if self._best is None and solution.is_complete():
             self._best = solution
