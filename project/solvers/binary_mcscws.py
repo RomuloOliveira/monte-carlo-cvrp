@@ -45,6 +45,9 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         self._best = solution
 
         for i, j in savings_list:
+            if solution.is_complete():
+                break
+
             if solution.can_process((i, j)):
                 processed = solution.process((i, j))
 
