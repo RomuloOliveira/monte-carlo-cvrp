@@ -17,10 +17,12 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
 
     def simulation(self, solution, pair, savings_list):
         """Do a Monte Carlo Simulation"""
-
         for i, j in savings_list:
+            if solution.is_complete():
+                break
+
             if solution.can_process((i, j)):
-                if random.random() > 0.20:
+                if random.random() > 0.15:
                     solution, inserted = solution.process((i, j))
 
         if self._best is None:
@@ -28,7 +30,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         elif solution.is_complete() and (solution.length() < self._best.length()):
             self._best = solution
 
-        return solution.length()
+        return solution.length(), solution.is_complete()
 
     def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using BinaryMCS-CWS method
@@ -46,9 +48,10 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         solution = BinaryMCSCWSSolution(data, vehicles)
         self._best = None
 
+        savings_copy = savings_list[:]
+
         while savings_list:
-            i, j = savings_list[0]
-            del savings_list[0]
+            i, j = savings_list.pop(0)
 
             if solution.is_complete():
                 break
@@ -59,23 +62,43 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 if not inserted:
                     continue
 
-                yes = 0
-                no = 0
-
-                savings_copy = savings_list[:]
+                minimum_yes = 9999999
+                minimum_no = 9999999
 
                 for r in range(50): # simulations
-                    yes = yes + self.simulation(processed.clone(), (i, j), savings_copy)
-                    no = no + self.simulation(solution.clone(), (i, j), savings_copy)
+                    length, complete = self.simulation(processed.clone(), (i, j), savings_copy)
+
+                    if complete:
+                        if length < minimum_yes:
+                            minimum_yes = length
+
+
+                    length, complete = self.simulation(solution.clone(), (i, j), savings_copy)
+
+                    if complete:
+                        if length < minimum_no:
+                            minimum_no = length
 
                     if time.time() - start > timeout:
                         break
 
-                if yes <= no:
+                print 'minimum_yes', minimum_yes
+                print 'minimum_no', minimum_no
+
+                if minimum_yes <= minimum_no:
+                    print 'yes'
                     solution = processed
+                else:
+                    print 'no'
+
+                print self._best.length()
+
+                print
 
             if time.time() - start > timeout:
                 break
+
+        print 'Constructed solution {}. Complete? {}'.format(solution.length(), solution.is_complete())
 
         if self._best is None:
             self._best = solution
