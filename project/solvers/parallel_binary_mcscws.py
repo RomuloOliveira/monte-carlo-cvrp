@@ -33,9 +33,6 @@ def simulation((solution, pair, savings_list)):
         if solution.is_complete() and (solution.length() < namespace.best.length() or not namespace.best.is_complete()):
             namespace.best = solution
 
-    print solution.length()
-    print namespace.best.length()
-
     if solution.is_complete():
         return solution.length()
 
@@ -54,7 +51,6 @@ class ParallelBinaryMCSCWSSolver(binary_mcscws.BinaryMCSCWSSolver):
 
         Returns a solution (ParallelBinaryMCSCWSSolution class))
         """
-        global minimum
         global namespace
         global lock
 
