@@ -70,8 +70,8 @@ class BaseSolution(object):
         """
         raise NotImplementedError()
 
-    def process(self, pair):
-        """Processes a pair of nodes into the current solution
+    def process(self, node_or_pair):
+        """Processes a node or a pair of nodes into the current solution
 
         MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
 
