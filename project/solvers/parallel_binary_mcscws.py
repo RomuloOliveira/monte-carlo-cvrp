@@ -72,8 +72,8 @@ class ParallelBinaryMCSCWSSolver(binary_mcscws.BinaryMCSCWSSolver):
                 yes = 0
                 no = 0
 
-                async_y = p.map_async(simulation, [(processed, (i, j), savings_list[:]) for r in range(50)])
-                async_n = p.map_async(simulation, [(solution, (i, j), savings_list[:]) for r in range(50)])
+                async_y = p.map_async(simulation, [(processed, (i, j), savings_list[:]) for r in range(20)])
+                async_n = p.map_async(simulation, [(solution, (i, j), savings_list[:]) for r in range(20)])
 
                 yes = async_y.get()
                 no = async_n.get()

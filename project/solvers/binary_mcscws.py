@@ -20,8 +20,8 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
 
         for i, j in savings_list:
             if solution.can_process((i, j)):
-                if random.random() > 0.4:
-                    solution = solution.process((i, j))
+                if random.random() > 0.20:
+                    solution, inserted = solution.process((i, j))
 
         if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
             self._best = solution
@@ -44,30 +44,36 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         solution = BinaryMCSCWSSolution(data, vehicles)
         self._best = solution
 
-        for i, j in savings_list:
+        while savings_list:
+            i, j = savings_list[0]
+            del savings_list[0]
+
             if solution.is_complete():
                 break
 
             if solution.can_process((i, j)):
-                processed = solution.process((i, j))
+                processed, inserted = solution.process((i, j))
+
+                if not inserted:
+                    continue
 
                 yes = 0
                 no = 0
 
                 for r in range(50): # simulations
-                    yes = yes + self.simulation(processed, (i, j), savings_list[:])
-                    no = no + self.simulation(solution, (i, j), savings_list[:])
+                    yes = yes + self.simulation(processed.clone(), (i, j), savings_list[:])
+                    no = no + self.simulation(solution.clone(), (i, j), savings_list[:])
 
                     if time.time() - start > timeout:
                         break
 
-                if yes < no:
+                if yes <= no:
                     solution = processed
-
-            if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
-                self._best = solution
 
             if time.time() - start > timeout:
                 break
+
+        if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
+            self._best = solution
 
         return self._best

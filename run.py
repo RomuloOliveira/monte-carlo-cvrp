@@ -24,7 +24,7 @@ def main():
     timeout = 300
 
     algorithms = [
-        (parallel_binary_mcscws_solver, 'ParallelBinaryMCSCWSSolver'),
+        # (parallel_binary_mcscws_solver, 'ParallelBinaryMCSCWSSolver'),
         (clarke_wright_solver, 'ClarkeWrightSolver'),
         (binary_mcscws_solver, 'BinaryMCSCWSSolver')
     ]

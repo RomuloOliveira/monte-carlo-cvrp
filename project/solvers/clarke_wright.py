@@ -66,12 +66,15 @@ class ClarkeWrightSolution(BaseSolution):
 
         i, j = new_solution.get_pair((a, b))
 
+        inserted = False
+
         if i.route_allocation() is None and j.route_allocation() is None:
             # Try to add the two nodes to a route
             for route in new_solution._routes:
                 if route.can_allocate([i, j]):
                     route.allocate([i, j])
                     new_solution._allocated = new_solution._allocated + 2
+                    inserted = True
                     break
         # either i or j is allocated
         elif ((i.route_allocation() is not None and j.route_allocation() is None) or
@@ -98,8 +101,9 @@ class ClarkeWrightSolution(BaseSolution):
 
                     route.allocate([to_insert], append)
                     new_solution._allocated = new_solution._allocated + 1
+                    inserted = True
 
-        return new_solution
+        return new_solution, inserted
 
     def can_process(self, pairs):
         """Returns True if this solution can process `pairs`
@@ -173,7 +177,7 @@ class ClarkeWrightSolver(BaseSolver):
 
         for i, j in savings_list:
             if solution.can_process((i, j)):
-                solution = solution.process((i, j))
+                solution, inserted = solution.process((i, j))
 
             if time.time() - start > timeout:
                 break
