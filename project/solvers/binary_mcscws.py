@@ -23,7 +23,9 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 if random.random() > 0.20:
                     solution, inserted = solution.process((i, j))
 
-        if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
+        if self._best is None:
+            self._best = solution
+        elif solution.is_complete() and (solution.length() < self._best.length()):
             self._best = solution
 
         return solution.length()
@@ -42,7 +44,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         savings_list = self.compute_savings_list(data)
 
         solution = BinaryMCSCWSSolution(data, vehicles)
-        self._best = solution
+        self._best = None
 
         while savings_list:
             i, j = savings_list[0]
@@ -60,9 +62,11 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 yes = 0
                 no = 0
 
+                savings_copy = savings_list[:]
+
                 for r in range(50): # simulations
-                    yes = yes + self.simulation(processed.clone(), (i, j), savings_list[:])
-                    no = no + self.simulation(solution.clone(), (i, j), savings_list[:])
+                    yes = yes + self.simulation(processed.clone(), (i, j), savings_copy)
+                    no = no + self.simulation(solution.clone(), (i, j), savings_copy)
 
                     if time.time() - start > timeout:
                         break
@@ -73,7 +77,9 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
             if time.time() - start > timeout:
                 break
 
-        if solution.is_complete() and (solution.length() < self._best.length() or not self._best.is_complete()):
+        if self._best is None:
+            self._best = solution
+        elif solution.is_complete() and (solution.length() < self._best.length()):
             self._best = solution
 
         return self._best
