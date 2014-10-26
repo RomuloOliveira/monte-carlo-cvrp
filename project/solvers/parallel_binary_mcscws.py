@@ -68,32 +68,22 @@ class ParallelBinaryMCSCWSSolver(binary_mcscws.BinaryMCSCWSSolver):
 
             if solution.can_process((i, j)):
                 processed = solution.process((i, j))
-                processed_best = namespace.best.process((i, j))
 
                 yes = 0
                 no = 0
 
                 async_y = p.map_async(simulation, [(processed, (i, j), savings_list[:]) for r in range(50)])
                 async_n = p.map_async(simulation, [(solution, (i, j), savings_list[:]) for r in range(50)])
-                async_by = p.map_async(simulation, [(namespace.best, (i, j), savings_list[:]) for r in range(50)])
-                async_bn = p.map_async(simulation, [(processed_best, (i, j), savings_list[:]) for r in range(50)])
 
                 yes = async_y.get()
                 no = async_n.get()
-                best_y = async_by.get()
-                best_n = async_bn.get()
 
                 if yes < no:
-                    print 'less yes'
                     solution = processed
-                else:
-                    print 'less no'
 
             with lock:
                 if solution.is_complete() and (solution.length() < namespace.best.length() or not namespace.best.is_complete()):
                     namespace.best = solution
-
-            solution = namespace.best
 
             if time.time() - start > timeout:
                 break
