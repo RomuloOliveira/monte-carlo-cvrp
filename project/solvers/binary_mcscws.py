@@ -73,7 +73,6 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                         if length < minimum_yes:
                             minimum_yes = length
 
-
                     length, complete = self.simulation(solution.clone(), (i, j), savings_copy)
 
                     if complete:

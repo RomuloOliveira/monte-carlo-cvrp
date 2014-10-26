@@ -82,7 +82,8 @@ class ParallelBinaryMCSCWSSolver(binary_mcscws.BinaryMCSCWSSolver):
                     solution = processed
 
             with lock:
-                if solution.is_complete() and (solution.length() < namespace.best.length() or not namespace.best.is_complete()):
+                if (solution.is_complete() and
+                        (solution.length() < namespace.best.length() or not namespace.best.is_complete())):
                     namespace.best = solution
 
             if time.time() - start > timeout:
@@ -90,6 +91,5 @@ class ParallelBinaryMCSCWSSolver(binary_mcscws.BinaryMCSCWSSolver):
 
         p.close()
         p.join()
-
 
         return namespace.best
