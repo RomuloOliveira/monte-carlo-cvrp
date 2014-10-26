@@ -5,7 +5,6 @@ import operator
 import time
 
 from project.solvers.base import BaseSolution, BaseSolver
-from project import models
 
 class ClarkeWrightSolution(BaseSolution):
     """Solution class for a Clarke and Wright Savings algorithm"""
