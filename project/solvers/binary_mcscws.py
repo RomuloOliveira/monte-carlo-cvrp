@@ -60,7 +60,7 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
                 yes = 0
                 no = 0
 
-                for r in range(10): # simulations
+                for r in range(50): # simulations
                     yes = yes + self.simulation(processed.clone(), (i, j), savings_copy)
                     no = no + self.simulation(solution.clone(), (i, j), savings_copy)
 
