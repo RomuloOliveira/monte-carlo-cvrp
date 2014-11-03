@@ -63,7 +63,7 @@ class Route(object):
             raise Exception('Trying to allocate more than route capacity')
 
         nodes_demand = 0
-        for node in nodes:
+        for node in [node for node in nodes]:
             if node._allocation:
                 node._allocation.deallocate([node])
 

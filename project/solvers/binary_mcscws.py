@@ -23,7 +23,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 break
 
             if solution.can_process((i, j)):
-                if random.random() > 0.15:
+                if random.random() > 0.11:
                     solution, inserted = solution.process((i, j))
 
         if self._best is None and solution.is_complete():
@@ -66,7 +66,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
                 minimum_yes = sys.maxsize
                 minimum_no = sys.maxsize
 
-                for r in range(25): # simulations
+                for r in range(200): # simulations
                     length, complete = self.simulation(processed.clone(), (i, j), savings_copy)
 
                     if complete:
