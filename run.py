@@ -23,7 +23,7 @@ def main():
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
 
-    timeout = 60
+    timeout = 300
 
     algorithms = [
         (clarke_wright_solver, 'ClarkeWrightSolver'),
