@@ -14,6 +14,7 @@ class SequentialClarkeWrightSolution(BaseSolution):
     def __init__(self, cvrp_problem, vehicles):
         super(SequentialClarkeWrightSolution, self).__init__(cvrp_problem, vehicles)
 
+        self._vehicles = vehicles
         self._routes = [models.Route(cvrp_problem, cvrp_problem.capacity()) for _ in range(len(self._nodes) - 1)]
 
         for i, node in enumerate([node for node in self._nodes.values() if node != cvrp_problem.depot()]):
@@ -28,7 +29,7 @@ class SequentialClarkeWrightSolution(BaseSolution):
             nodes
         """
 
-        new_solution = self.__class__(self._problem, len(self._routes))
+        new_solution = self.__class__(self._problem, self._vehicles)
 
         # Clone routes
         for index, r in enumerate(self._routes):
@@ -39,6 +40,18 @@ class SequentialClarkeWrightSolution(BaseSolution):
                 new_route.allocate([new_node])
 
         return new_solution
+
+    def is_complete(self):
+        """Returns True if this is a complete solution, i.e, all nodes are allocated"""
+        allocated = all(
+            [node.route_allocation() is not None for node in self._nodes.values() if node != self._problem.depot()]
+        )
+
+        valid_routes = len(self._routes) == self._vehicles
+
+        valid_demands = all([route.demand() <= self._problem._capacity for route in self._routes])
+
+        return allocated and valid_routes and valid_demands
 
     def process(self, pair):
         """Processes a pair of nodes into the current solution
@@ -139,6 +152,9 @@ class SequentialClarkeWrightSolver(BaseSolver):
         start = time.time()
 
         for i, j in savings_list[:]:
+            if solution.is_complete():
+                break
+
             if solution.can_process((i, j)):
                 solution, inserted = solution.process((i, j))
 

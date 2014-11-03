@@ -23,9 +23,9 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
                 if random.random() > 0.1:
                     solution, inserted = solution.process((i, j))
 
-        if self._best is None:
+        if self._best is None and solution.is_complete():
             self._best = solution
-        elif (solution.length() < self._best.length()):
+        elif solution.is_complete() and (solution.length() < self._best.length()):
             self._best = solution
 
         return solution.length()
@@ -49,6 +49,9 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
         savings_copy = savings_list[:]
 
         for i, j in savings_list:
+            if solution.is_complete():
+                break
+
             if solution.can_process((i, j)):
                 processed, inserted = solution.process((i, j))
 
@@ -71,9 +74,9 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
             if time.time() - start > timeout:
                 break
 
-        if self._best is None:
+        if self._best is None and solution.is_complete():
             self._best = solution
-        elif solution.length() < self._best.length():
+        elif solution.is_complete() and solution.length() < self._best.length():
             self._best = solution
 
         return self._best
