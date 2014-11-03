@@ -19,19 +19,16 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
     def simulation(self, solution, pair, savings_list):
         """Do a Monte Carlo Simulation"""
         for i, j in savings_list:
-            if solution.is_complete():
-                break
-
             if solution.can_process((i, j)):
-                if random.random() > 0.11:
+                if random.random() > 0.15:
                     solution, inserted = solution.process((i, j))
 
-        if self._best is None and solution.is_complete():
+        if self._best is None:
             self._best = solution
-        elif solution.is_complete() and (solution.length() < self._best.length()):
+        elif (solution.length() < self._best.length()):
             self._best = solution
 
-        return solution.length(), solution.is_complete()
+        return solution.length()
 
     def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using BinaryMCS-CWS method
@@ -54,43 +51,31 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
         while savings_list:
             i, j = savings_list.pop(0)
 
-            if solution.is_complete():
-                break
-
             if solution.can_process((i, j)):
                 processed, inserted = solution.process((i, j))
 
                 if not inserted:
                     continue
 
-                minimum_yes = sys.maxsize
-                minimum_no = sys.maxsize
+                yes = 0
+                no = 0
 
-                for r in range(200): # simulations
-                    length, complete = self.simulation(processed.clone(), (i, j), savings_copy)
-
-                    if complete:
-                        if length < minimum_yes:
-                            minimum_yes = length
-
-                    length, complete = self.simulation(solution.clone(), (i, j), savings_copy)
-
-                    if complete:
-                        if length < minimum_no:
-                            minimum_no = length
+                for r in range(10): # simulations
+                    yes = yes + self.simulation(processed.clone(), (i, j), savings_copy)
+                    no = no + self.simulation(solution.clone(), (i, j), savings_copy)
 
                     if time.time() - start > timeout:
                         break
 
-                if minimum_yes <= minimum_no:
+                if yes <= no:
                     solution = processed
 
             if time.time() - start > timeout:
                 break
 
-        if self._best is None and solution.is_complete():
+        if self._best is None:
             self._best = solution
-        elif solution.is_complete() and (solution.length() < self._best.length()):
+        elif solution.length() < self._best.length():
             self._best = solution
 
         return self._best
