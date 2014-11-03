@@ -20,13 +20,16 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
         """Do a Monte Carlo Simulation"""
         for i, j in savings_list:
             if solution.can_process((i, j)):
-                if random.random() > 0.15:
+                if random.random() > 0.1:
                     solution, inserted = solution.process((i, j))
 
         if self._best is None:
             self._best = solution
         elif (solution.length() < self._best.length()):
             self._best = solution
+            print 'best', self._best.length()
+
+        print solution.length()
 
         return solution.length()
 
@@ -48,9 +51,7 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
 
         savings_copy = savings_list[:]
 
-        while savings_list:
-            i, j = savings_list.pop(0)
-
+        for i, j in savings_list:
             if solution.can_process((i, j)):
                 processed, inserted = solution.process((i, j))
 
@@ -60,12 +61,14 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
                 yes = 0
                 no = 0
 
-                for r in range(50): # simulations
+                for r in range(15): # simulations
                     yes = yes + self.simulation(processed.clone(), (i, j), savings_copy)
                     no = no + self.simulation(solution.clone(), (i, j), savings_copy)
 
                     if time.time() - start > timeout:
                         break
+
+                print 'simulations ended', yes + no
 
                 if yes <= no:
                     solution = processed
@@ -77,5 +80,7 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
             self._best = solution
         elif solution.length() < self._best.length():
             self._best = solution
+
+        print solution.length()
 
         return self._best
