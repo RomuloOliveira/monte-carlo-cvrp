@@ -5,9 +5,7 @@ import sys
 import time
 
 from project import data_input, util
-from project.solvers import clarke_wright, binary_mcscws, centroide
-
-from project.solvers import sequential_clarke_wright
+from project.solvers import clarke_wright, sequential_clarke_wright, binary_mcscws, centroide
 
 def usage():
     print "python {} <tspblib_file> <vehicles_number>".format(sys.argv[0])
@@ -30,7 +28,7 @@ def main():
     algorithms = [
         (clarke_wright_solver, 'ClarkeWrightSolver'),
         (sequential_clarke_wright_solver, 'SequentialClarkeWrightSolver'),
-        # (binary_mcscws_solver, 'BinaryMCSCWSSolver'),
+        (binary_mcscws_solver, 'BinaryMCSCWSSolver'),
         # (centroide_solver, 'CentroideSolver')
     ]
 

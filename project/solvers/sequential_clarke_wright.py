@@ -19,6 +19,27 @@ class SequentialClarkeWrightSolution(BaseSolution):
         for i, node in enumerate([node for node in self._nodes.values() if node != cvrp_problem.depot()]):
             self._routes[i].allocate([node])
 
+    def clone(self):
+        """Returns a deep copy of self
+
+        Clones:
+            routes
+            allocation
+            nodes
+        """
+
+        new_solution = self.__class__(self._problem, len(self._routes))
+
+        # Clone routes
+        for index, r in enumerate(self._routes):
+            new_route = new_solution._routes[index] = models.Route(self._problem, self._problem.capacity())
+            for node in r.nodes():
+                # Insere new node on new route
+                new_node = new_solution._nodes[node]
+                new_route.allocate([new_node])
+
+        return new_solution
+
     def process(self, pair):
         """Processes a pair of nodes into the current solution
 
@@ -28,7 +49,7 @@ class SequentialClarkeWrightSolution(BaseSolution):
         """
         a, b = pair
 
-        new_solution = self
+        new_solution = self.clone()
 
         i, j = new_solution.get_pair((a, b))
 
@@ -39,27 +60,24 @@ class SequentialClarkeWrightSolution(BaseSolution):
 
         if ((route_i is not None and route_j is not None) and (route_i != route_j)):
             if route_i._nodes.index(i) == 0 and route_j._nodes.index(j) == len(route_j._nodes) - 1:
-                if route_i.can_allocate(route_j._nodes):
-                    route_i.allocate(route_j._nodes)
-
-                    if not route_j._nodes:
-                        self._routes.remove(route_j)
+                if route_j.can_allocate(route_i._nodes):
+                    route_j.allocate(route_i._nodes)
 
                     if i.route_allocation() != j.route_allocation():
                         raise Exception('wtf')
 
                     inserted = True
             elif route_j._nodes.index(j) == 0 and route_i._nodes.index(i) == len(route_i._nodes) - 1:
-                if route_j.can_allocate(route_i._nodes):
-                    route_j.allocate(route_i._nodes)
-
-                    if not route_i._nodes:
-                        self._routes.remove(route_i)
+                if route_i.can_allocate(route_j._nodes):
+                    route_i.allocate(route_j._nodes)
 
                     if i.route_allocation() != j.route_allocation():
                         raise Exception('wtf j')
 
                     inserted = True
+
+
+        new_solution._routes = [route for route in new_solution._routes if route._nodes]
 
         return new_solution, inserted
 
