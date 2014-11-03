@@ -60,11 +60,10 @@ class CentroideSolution(base.BaseSolution):
 
         new_solution = self.clone()
 
-        depot = new_solution._problem.depot()
-
         while not new_solution.is_complete():
             for r in new_solution._routes:
-                far_far_away_node = random.choice(new_solution._nodes.values()) # new_solution._get_nearest_not_allocated_node(depot)
+                # new_solution._get_nearest_not_allocated_node(depot)
+                far_far_away_node = random.choice(new_solution._nodes.values())
 
                 if far_far_away_node is None:
                     break

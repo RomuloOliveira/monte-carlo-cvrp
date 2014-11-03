@@ -49,7 +49,7 @@ class SequentialClarkeWrightSolution(BaseSolution):
 
         valid_routes = len(self._routes) == self._vehicles
 
-        valid_demands = all([route.demand() <= self._problem._capacity for route in self._routes])
+        valid_demands = all([route.demand() <= route.capacity() for route in self._routes])
 
         return allocated and valid_routes and valid_demands
 
@@ -88,7 +88,6 @@ class SequentialClarkeWrightSolution(BaseSolution):
                         raise Exception('wtf j')
 
                     inserted = True
-
 
         new_solution._routes = [route for route in new_solution._routes if route._nodes]
 

@@ -3,7 +3,6 @@
 
 import random
 import time
-import sys
 
 from project.solvers import sequential_clarke_wright
 
