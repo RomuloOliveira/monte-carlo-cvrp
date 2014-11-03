@@ -27,9 +27,6 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
             self._best = solution
         elif (solution.length() < self._best.length()):
             self._best = solution
-            print 'best', self._best.length()
-
-        print solution.length()
 
         return solution.length()
 
@@ -68,8 +65,6 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
                     if time.time() - start > timeout:
                         break
 
-                print 'simulations ended', yes + no
-
                 if yes <= no:
                     solution = processed
 
@@ -80,7 +75,5 @@ class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
             self._best = solution
         elif solution.length() < self._best.length():
             self._best = solution
-
-        print solution.length()
 
         return self._best
