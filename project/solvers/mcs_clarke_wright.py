@@ -96,11 +96,7 @@ class MCSClarkeWrightSolver(BaseSolver):
 
             sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
 
-            multiple_savings_lists.append(([nodes for nodes, saving in sorted_savings_list], total_savings))
-
-        # Returns in order
-        return [lst for lst,savings in sorted(multiple_savings_lists, key=operator.itemgetter(1), reverse=True)]
-
+            yield [nodes for nodes, saving in sorted_savings_list]
 
     def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using Clarke and Wright Savings methods
@@ -115,9 +111,9 @@ class MCSClarkeWrightSolver(BaseSolver):
         start = time.time()
         time_found = None
 
-        savings_lists = self.compute_list_of_savings_list(data)
-
         best = MCSClarkeWrightSolution(data, vehicles)
+
+        savings_lists = self.compute_list_of_savings_list(data)
 
         for savings_list in savings_lists:
             solution = MCSClarkeWrightSolution(data, vehicles)
