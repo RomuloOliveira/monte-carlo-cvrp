@@ -112,14 +112,14 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         Returns a solution (MCSClarkeWrightSolution class))
         """
+        start = time.time()
+
         savings_lists = self.compute_list_of_savings_list(data)
 
         best = None
 
         for savings_list in savings_lists:
             solution = MCSClarkeWrightSolution(data, vehicles)
-
-            start = time.time()
 
             for i, j in savings_list[:]:
                 if solution.is_complete():
