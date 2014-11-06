@@ -58,40 +58,23 @@ class MCSClarkeWrightSolution(SequentialClarkeWrightSolution):
 
 class MCSClarkeWrightSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
-    def compute_savings_list(self, data):
-        """Compute Clarke and Wright savings list
 
-        A saving list is a matrix containing the saving amount S between i and j
-
-        S is calculated by S = d(0,i) + d(0,j) - d(i,j) (CLARKE; WRIGHT, 1964)
-        """
-
-        savings_list = {}
-
-        for i, j in data.edges():
-            t = (i, j)
-
-            if i == data.depot() or j == data.depot():
-                continue
-
-            savings_list[t] = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
-
-        sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
-
-        return [nodes for nodes, saving in sorted_savings_list]
-
-    def compute_multiples_savings_list(self, data):
+    def compute_list_of_savings_list(self, data):
         """Compute Clarke and Wright savings list
 
         A saving list is a matrix containing the saving amount S between i and j
 
         S is calculated by S = d(0,i) + d(0,j) - d(i,j) + P
+
+        Returns a list of savings list, ordered by total saving
         """
 
         multiple_savings_lists = []
 
         for r in range(2000):
             savings_list = {}
+
+            total_savings = 0
 
             for i, j in data.edges():
                 t = (i, j)
@@ -107,13 +90,16 @@ class MCSClarkeWrightSolver(BaseSolver):
                 saving = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
                 saving = saving + (p * saving)
 
+                total_savings = total_savings + saving
+
                 savings_list[t] = saving
 
             sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
 
-            multiple_savings_lists.append([nodes for nodes, saving in sorted_savings_list])
+            multiple_savings_lists.append(([nodes for nodes, saving in sorted_savings_list], total_savings))
 
-        return multiple_savings_lists
+        # Returns in order
+        return [lst for lst,savings in sorted(multiple_savings_lists, key=operator.itemgetter(0), reverse=True)]
 
 
     def solve(self, data, vehicles, timeout):
@@ -126,7 +112,7 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         Returns a solution (MCSClarkeWrightSolution class))
         """
-        savings_lists = self.compute_multiples_savings_list(data)
+        savings_lists = self.compute_list_of_savings_list(data)
 
         best = None
 
