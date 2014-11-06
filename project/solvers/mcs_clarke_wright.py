@@ -71,6 +71,8 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         multiple_savings_lists = []
 
+        p = 0.05
+
         for r in range(2000):
             savings_list = {}
 
@@ -83,9 +85,7 @@ class MCSClarkeWrightSolver(BaseSolver):
                     continue
 
                 if random.random() > 0.5:
-                    p = 0.05
-                else:
-                    p = -0.05
+                    p = -p
 
                 saving = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
                 saving = saving + (p * saving)
@@ -99,7 +99,7 @@ class MCSClarkeWrightSolver(BaseSolver):
             multiple_savings_lists.append(([nodes for nodes, saving in sorted_savings_list], total_savings))
 
         # Returns in order
-        return [lst for lst,savings in sorted(multiple_savings_lists, key=operator.itemgetter(0), reverse=True)]
+        return [lst for lst,savings in sorted(multiple_savings_lists, key=operator.itemgetter(1), reverse=True)]
 
 
     def solve(self, data, vehicles, timeout):
@@ -128,8 +128,8 @@ class MCSClarkeWrightSolver(BaseSolver):
                 if solution.can_process((i, j)):
                     solution, inserted = solution.process((i, j))
 
-                    if inserted:
-                        savings_list.remove((i, j))
+                if time.time() - start > timeout:
+                    break
 
             if time.time() - start > timeout:
                 break
