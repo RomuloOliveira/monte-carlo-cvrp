@@ -8,10 +8,11 @@ import random
 
 from project import models
 
-from project.solvers.base import BaseSolution, BaseSolver
+from project.solvers.base import BaseSolver
+from project.solvers.sequential_clarke_wright import SequentialClarkeWrightSolution
 
-class MCSClarkeWrightSolution(BaseSolution):
-    """Solution class for a Clarke and Wright Savings algorithm"""
+class MCSClarkeWrightSolution(SequentialClarkeWrightSolution):
+    """Solution class for a Clarke and Wright Savings algorithm using Monte Carlo Methods"""
 
     def __init__(self, cvrp_problem, vehicles):
         super(MCSClarkeWrightSolution, self).__init__(cvrp_problem, vehicles)
@@ -54,63 +55,6 @@ class MCSClarkeWrightSolution(BaseSolution):
         valid_demands = all([route.demand() <= route.capacity() for route in self._routes])
 
         return allocated and valid_routes and valid_demands
-
-    def process(self, pair):
-        """Processes a pair of nodes into the current solution
-
-        MUST CREATE A NEW INSTANCE, NOT CHANGE ANY INSTANCE ATTRIBUTES
-
-        Returns a new instance (deep copy) of self object
-        """
-        a, b = pair
-
-        new_solution = self.clone()
-
-        i, j = new_solution.get_pair((a, b))
-
-        route_i = i.route_allocation()
-        route_j = j.route_allocation()
-
-        inserted = False
-
-        if ((route_i is not None and route_j is not None) and (route_i != route_j)):
-            if route_i._nodes.index(i) == 0 and route_j._nodes.index(j) == len(route_j._nodes) - 1:
-                if route_j.can_allocate(route_i._nodes):
-                    route_j.allocate(route_i._nodes)
-
-                    if i.route_allocation() != j.route_allocation():
-                        raise Exception('wtf')
-
-                    inserted = True
-            elif route_j._nodes.index(j) == 0 and route_i._nodes.index(i) == len(route_i._nodes) - 1:
-                if route_i.can_allocate(route_j._nodes):
-                    route_i.allocate(route_j._nodes)
-
-                    if i.route_allocation() != j.route_allocation():
-                        raise Exception('wtf j')
-
-                    inserted = True
-
-        new_solution._routes = [route for route in new_solution._routes if route._nodes]
-
-        return new_solution, inserted
-
-    def can_process(self, pairs):
-        """Returns True if this solution can process `pairs`
-
-        Parameters:
-            pairs: List of pairs
-        """
-        i, j = pairs
-
-        # Neither points are in a route
-        if i.route_allocation() is None or j.route_allocation() is None:
-            return True
-
-        if self._allocated == len(list(self._problem.nodes())) - 1: # All nodes in a route
-            return False
-
-        return False
 
 class MCSClarkeWrightSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
