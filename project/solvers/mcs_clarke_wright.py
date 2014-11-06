@@ -146,7 +146,7 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         multiple_savings_lists = []
 
-        for r in range(1000):
+        for r in range(2000):
             savings_list = {}
 
             for i, j in data.edges():
@@ -201,8 +201,8 @@ class MCSClarkeWrightSolver(BaseSolver):
                     if inserted:
                         savings_list.remove((i, j))
 
-                if time.time() - start > timeout:
-                    break
+            if time.time() - start > timeout:
+                break
 
             if solution.is_complete() and best is None:
                 best = solution
