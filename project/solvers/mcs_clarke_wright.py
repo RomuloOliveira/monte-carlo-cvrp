@@ -113,6 +113,7 @@ class MCSClarkeWrightSolver(BaseSolver):
         Returns a solution (MCSClarkeWrightSolution class))
         """
         start = time.time()
+        time_found = None
 
         savings_lists = self.compute_list_of_savings_list(data)
 
@@ -136,8 +137,11 @@ class MCSClarkeWrightSolver(BaseSolver):
 
             if solution.is_complete() and not best.is_complete():
                 best = solution
-            elif solution.is_complete() and (best.is_complete() and solution.length() < best.length() or
-                not best.is_complete()):
+                time_found = time.time() - start
+            elif solution.is_complete() and solution.length() < best.length():
                 best = solution
+                time_found = time.time() - start
+
+        print 'best solution found on {}'.format(time_found)
 
         return best
