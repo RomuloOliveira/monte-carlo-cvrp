@@ -116,7 +116,7 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         savings_lists = self.compute_list_of_savings_list(data)
 
-        best = None
+        best = MCSClarkeWrightSolution(data, vehicles)
 
         for savings_list in savings_lists:
             solution = MCSClarkeWrightSolution(data, vehicles)
@@ -134,9 +134,10 @@ class MCSClarkeWrightSolver(BaseSolver):
             if time.time() - start > timeout:
                 break
 
-            if solution.is_complete() and best is None:
+            if solution.is_complete() and not best.is_complete():
                 best = solution
-            elif solution.is_complete() and best.is_complete() and solution.length() < best.length():
+            elif solution.is_complete() and (best.is_complete() and solution.length() < best.length() or
+                not best.is_complete()):
                 best = solution
 
         return best
