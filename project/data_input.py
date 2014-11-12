@@ -35,7 +35,7 @@ def _parse_depot_section(f):
 
     for line in f:
         line = strip(line)
-        if line == '-1': # End of section
+        if line == '-1' or line == 'EOF': # End of section
             break
         else:
             depots.append(line)
