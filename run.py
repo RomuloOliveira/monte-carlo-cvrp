@@ -46,9 +46,9 @@ def main():
 
         if not solution.is_complete():
             print 'Solution from algorithm {} not a complete solution'.format(algorithm)
-        else:
-            print '{} solution:'.format(algorithm)
-            util.print_solution(solution)
+
+        print '{} solution:'.format(algorithm)
+        util.print_solution(solution)
 
         print 'Elapsed time (seconds): {}'.format(elapsed)
 
