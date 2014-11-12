@@ -69,9 +69,7 @@ class MCSClarkeWrightSolver(BaseSolver):
         Returns a list of savings list, ordered by total saving
         """
 
-        multiple_savings_lists = []
-
-        p = 0.05
+        lambda_p = 0.1
 
         for r in range(2000):
             savings_list = {}
@@ -84,11 +82,10 @@ class MCSClarkeWrightSolver(BaseSolver):
                 if i == data.depot() or j == data.depot():
                     continue
 
-                if random.random() > 0.5:
-                    p = -p
+                p = random.uniform(-lambda_p, lambda_p)
 
                 saving = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
-                saving = saving + (p * saving)
+                saving = saving + (saving * p)
 
                 total_savings = total_savings + saving
 
@@ -96,7 +93,7 @@ class MCSClarkeWrightSolver(BaseSolver):
 
             sorted_savings_list = sorted(savings_list.items(), key=operator.itemgetter(1), reverse=True)
 
-            yield [nodes for nodes, saving in sorted_savings_list]
+            yield [nodes for nodes, saving_count in sorted_savings_list]
 
     def solve(self, data, vehicles, timeout):
         """Solves the CVRP problem using Clarke and Wright Savings methods
