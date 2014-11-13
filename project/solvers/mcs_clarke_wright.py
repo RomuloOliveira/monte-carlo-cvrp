@@ -69,7 +69,7 @@ class MCSClarkeWrightSolver(BaseSolver):
         Returns a list of savings list, ordered by total saving
         """
 
-        lambda_p = 0.1
+        lambda_p = 0.05
 
         for r in range(2000):
             savings_list = {}
@@ -128,10 +128,7 @@ class MCSClarkeWrightSolver(BaseSolver):
             if time.time() - start > timeout:
                 break
 
-            if solution.is_complete() and not best.is_complete():
-                best = solution
-                time_found = time.time() - start
-            elif solution.is_complete() and solution.length() < best.length():
+            if solution.length() < best.length():
                 best = solution
                 time_found = time.time() - start
 
