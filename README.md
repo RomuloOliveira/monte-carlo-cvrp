@@ -1,7 +1,7 @@
 Monte Carlo Methods - CVRP
 =======================
 
-Python implementation of CVRP algorithms using Monte Carlo Methods.
+Python implementation of the Capacitated Vehicle Routing Problem algorithms using Monte Carlo Methods.
 
 Algorithms:
 
