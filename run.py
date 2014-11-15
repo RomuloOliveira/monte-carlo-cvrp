@@ -5,7 +5,7 @@ import sys
 import time
 
 from project import data_input, util
-from project.solvers import clarke_wright, sequential_clarke_wright, mcs_clarke_wright, binary_mcscws # , centroide
+from project.solvers import clarke_wright, sequential_clarke_wright, mcs_clarke_wright, binary_mcscws
 
 def usage():
     print "python {} <tspblib_file> <vehicles_number> [<lambda_p>]".format(sys.argv[0])
@@ -26,17 +26,13 @@ def main():
     sequential_clarke_wright_solver = sequential_clarke_wright.SequentialClarkeWrightSolver()
     mcs_clarke_wright_solver = mcs_clarke_wright.MCSClarkeWrightSolver(lambda_p)
     binary_mcscws_solver = binary_mcscws.BinaryMCSCWSSolver()
-    # centroide_solver = centroide.CentroideSolver()
-    # parallel_binary_mcscws_solver = parallel_binary_mcscws.ParallelBinaryMCSCWSSolver()
 
     timeout = 300
 
     algorithms = [
         (clarke_wright_solver, 'ClarkeWrightSolver'),
         (sequential_clarke_wright_solver, 'SequentialClarkeWrightSolver'),
-        (mcs_clarke_wright_solver, 'MCSClarkeWrightSolver'),
-        # (binary_mcscws_solver, 'BinaryMCSCWSSolver'),
-        # (centroide_solver, 'CentroideSolver')
+        (mcs_clarke_wright_solver, 'MCSClarkeWrightSolver')
     ]
 
     best_algorithm = None
