@@ -8,21 +8,26 @@ from project import data_input, util
 from project.solvers import clarke_wright, sequential_clarke_wright, mcs_clarke_wright, binary_mcscws # , centroide
 
 def usage():
-    print "python {} <tspblib_file> <vehicles_number>".format(sys.argv[0])
+    print "python {} <tspblib_file> <vehicles_number> [<lambda_p>]".format(sys.argv[0])
 
 def main():
-    if len(sys.argv) != 3: # python main.py <file> <vehicles_number>
+    if len(sys.argv) < 3: # python main.py <file> <vehicles_number> [<p>]
         return usage()
-
-    clarke_wright_solver = clarke_wright.ClarkeWrightSolver()
-    sequential_clarke_wright_solver = sequential_clarke_wright.SequentialClarkeWrightSolver()
-    mcs_clarke_wright_solver = mcs_clarke_wright.MCSClarkeWrightSolver()
-    binary_mcscws_solver = binary_mcscws.BinaryMCSCWSSolver()
-    # centroide_solver = centroide.CentroideSolver()
-    # parallel_binary_mcscws_solver = parallel_binary_mcscws.ParallelBinaryMCSCWSSolver()
 
     data = data_input.read_file(sys.argv[1])
     vehicles = int(sys.argv[2])
+
+    lambda_p = None
+
+    if sys.argv == 4:
+        lambda_p = int(sys.argv[3])
+
+    clarke_wright_solver = clarke_wright.ClarkeWrightSolver()
+    sequential_clarke_wright_solver = sequential_clarke_wright.SequentialClarkeWrightSolver()
+    mcs_clarke_wright_solver = mcs_clarke_wright.MCSClarkeWrightSolver(lambda_p)
+    binary_mcscws_solver = binary_mcscws.BinaryMCSCWSSolver()
+    # centroide_solver = centroide.CentroideSolver()
+    # parallel_binary_mcscws_solver = parallel_binary_mcscws.ParallelBinaryMCSCWSSolver()
 
     timeout = 300
 
