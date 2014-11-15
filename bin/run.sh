@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 . bin/clean.sh
 . bin/build.sh
 
