@@ -20,7 +20,7 @@ def main():
     lambda_p = None
 
     if sys.argv == 4:
-        lambda_p = int(sys.argv[3])
+        lambda_p = float(sys.argv[3])
 
     clarke_wright_solver = clarke_wright.ClarkeWrightSolver()
     sequential_clarke_wright_solver = sequential_clarke_wright.SequentialClarkeWrightSolver()
