@@ -59,6 +59,16 @@ class MCSClarkeWrightSolution(SequentialClarkeWrightSolution):
 class MCSClarkeWrightSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
 
+    default_lambda_p = 0.05
+
+    def __init__(self, lambda_p=None, *args, **kwargs):
+        super(MCSClarkeWrightSolver, self).__init__()
+
+        if lambda_p is None:
+            lambda_p = self.default_lambda_p
+
+        self._lambda_p = lambda_p
+
     def compute_list_of_savings_list(self, data):
         """Compute Clarke and Wright savings list
 
@@ -68,8 +78,6 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         Returns a list of savings list, ordered by total saving
         """
-
-        lambda_p = 0.05
 
         for r in range(2000):
             savings_list = {}
@@ -82,7 +90,7 @@ class MCSClarkeWrightSolver(BaseSolver):
                 if i == data.depot() or j == data.depot():
                     continue
 
-                p = random.uniform(-lambda_p, lambda_p)
+                p = random.uniform(-self._lambda_p, self._lambda_p)
 
                 saving = data.distance(data.depot(), i) + data.distance(data.depot(), j) - data.distance(i, j)
                 saving = saving + (saving * p)
