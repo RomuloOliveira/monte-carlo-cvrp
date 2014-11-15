@@ -120,6 +120,9 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         savings_lists = self.compute_list_of_savings_list(data)
 
+        solution_lengths = 0
+        processed_count = 0
+
         for savings_list in savings_lists:
             solution = MCSClarkeWrightSolution(data, vehicles)
 
@@ -140,6 +143,12 @@ class MCSClarkeWrightSolver(BaseSolver):
                 best = solution
                 time_found = time.time() - start
 
+            processed_count = processed_count + 1
+            solution_lengths = solution_lengths + solution.length()
+
         print 'best solution found on {}'.format(time_found)
+
+        if processed_count:
+            print 'average solution lengths: {}'.format(solution_lengths / float(processed_count))
 
         return best
