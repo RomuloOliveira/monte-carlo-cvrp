@@ -117,6 +117,7 @@ class MCSClarkeWrightSolver(BaseSolver):
         time_found = None
 
         best = MCSClarkeWrightSolution(data, vehicles)
+        best_feasible = best
 
         savings_lists = self.compute_list_of_savings_list(data)
 
@@ -139,6 +140,11 @@ class MCSClarkeWrightSolver(BaseSolver):
             if time.time() - start > timeout:
                 break
 
+            if solution.is_complete() and not best_feasible.is_complete():
+                best_feasible = solution
+            elif solution.is_complete() and solution.length() < best.length():
+                best_feasible = solution
+
             if solution.length() < best.length():
                 best = solution
                 time_found = time.time() - start
@@ -150,5 +156,10 @@ class MCSClarkeWrightSolver(BaseSolver):
 
         if processed_count:
             print 'average solution lengths: {}'.format(solution_lengths / float(processed_count))
+
+        if not best.is_complete():
+            from project import util
+            print 'Best solution not feasible, printing best feasible found'
+            util.print_solution(best_feasible)
 
         return best
