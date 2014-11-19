@@ -8,11 +8,11 @@ from project import models
 
 from project.solvers.base import BaseSolution, BaseSolver
 
-class SequentialClarkeWrightSolution(BaseSolution):
-    """Solution class for a Clarke and Wright Savings algorithm"""
+class ClarkeWrightSolution(BaseSolution):
+    """Solution class for a Clarke and Wright Savings parallel algorithm"""
 
     def __init__(self, cvrp_problem, vehicles):
-        super(SequentialClarkeWrightSolution, self).__init__(cvrp_problem, vehicles)
+        super(ClarkeWrightSolution, self).__init__(cvrp_problem, vehicles)
 
         self._vehicles = vehicles
         self._routes = [models.Route(cvrp_problem, cvrp_problem.capacity()) for _ in range(len(self._nodes) - 1)]
@@ -110,7 +110,7 @@ class SequentialClarkeWrightSolution(BaseSolution):
 
         return False
 
-class SequentialClarkeWrightSolver(BaseSolver):
+class ClarkeWrightSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
     def compute_savings_list(self, data):
         """Compute Clarke and Wright savings list
@@ -142,11 +142,11 @@ class SequentialClarkeWrightSolver(BaseSolver):
             vehicles: Vehicles number
             timeout: max processing time in seconds
 
-        Returns a solution (SequentialClarkeWrightSolution class))
+        Returns a solution (ClarkeWrightSolution class))
         """
         savings_list = self.compute_savings_list(data)
 
-        solution = SequentialClarkeWrightSolution(data, vehicles)
+        solution = ClarkeWrightSolution(data, vehicles)
 
         start = time.time()
 

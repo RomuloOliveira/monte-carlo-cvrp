@@ -5,7 +5,7 @@ import sys
 import time
 
 from project import data_input, util
-from project.solvers import sequential_clarke_wright, mcs_clarke_wright, binary_mcscws
+from project.solvers import clarke_wright, mcs_clarke_wright, binary_mcscws
 
 def usage():
     print "python {} <tspblib_file> <vehicles_number> [<lambda_p>]".format(sys.argv[0])
@@ -22,15 +22,15 @@ def main():
     if sys.argv == 4:
         lambda_p = float(sys.argv[3])
 
-    sequential_clarke_wright_solver = sequential_clarke_wright.SequentialClarkeWrightSolver()
-    mcs_clarke_wright_solver = mcs_clarke_wright.MCSClarkeWrightSolver(lambda_p)
+    clarke_wright_solver = clarke_wright.ClarkeWrightSolver()
+    mcs_clarke_wright_solver = mcs_clarke_wright.MonteCarloSavingsSolver(lambda_p)
     binary_mcscws_solver = binary_mcscws.BinaryMCSCWSSolver()
 
     timeout = 300
 
     algorithms = [
-        (sequential_clarke_wright_solver, 'SequentialClarkeWrightSolver'),
-        (mcs_clarke_wright_solver, 'MCSClarkeWrightSolver'),
+        (clarke_wright_solver, 'ClarkeWrightSolver'),
+        (mcs_clarke_wright_solver, 'MonteCarloSavingsSolver'),
         (binary_mcscws_solver, 'BinaryMCSCWSSolver')
     ]
 

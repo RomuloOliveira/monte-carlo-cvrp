@@ -9,13 +9,13 @@ import random
 from project import models
 
 from project.solvers.base import BaseSolver
-from project.solvers.sequential_clarke_wright import SequentialClarkeWrightSolution
+from project.solvers.clarke_wright import ClarkeWrightSolution
 
-class MCSClarkeWrightSolution(SequentialClarkeWrightSolution):
-    """Solution class for a Clarke and Wright Savings algorithm using Monte Carlo Methods"""
+class MonteCarloSavingsSolution(ClarkeWrightSolution):
+    """Solution class for a Clarke and Wright Savings algorithm using Monte Carlo Savings algorithm (OLIVEIRA, 2014)"""
 
     def __init__(self, cvrp_problem, vehicles):
-        super(MCSClarkeWrightSolution, self).__init__(cvrp_problem, vehicles)
+        super(MonteCarloSavingsSolution, self).__init__(cvrp_problem, vehicles)
 
         self._vehicles = vehicles
         self._routes = [models.Route(cvrp_problem, cvrp_problem.capacity()) for _ in range(len(self._nodes) - 1)]
@@ -56,13 +56,13 @@ class MCSClarkeWrightSolution(SequentialClarkeWrightSolution):
 
         return allocated and valid_routes and valid_demands
 
-class MCSClarkeWrightSolver(BaseSolver):
+class MonteCarloSavingsSolver(BaseSolver):
     """Clark and Wright Savings algorithm solver class"""
 
     default_lambda_p = 0.05
 
     def __init__(self, lambda_p=None, *args, **kwargs):
-        super(MCSClarkeWrightSolver, self).__init__()
+        super(MonteCarloSavingsSolver, self).__init__()
 
         if lambda_p is None:
             lambda_p = self.default_lambda_p
@@ -104,19 +104,19 @@ class MCSClarkeWrightSolver(BaseSolver):
             yield [nodes for nodes, saving_count in sorted_savings_list]
 
     def solve(self, data, vehicles, timeout):
-        """Solves the CVRP problem using Clarke and Wright Savings methods
+        """Solves the CVRP problem using Monte Carlo Savings method (OLIVEIRA, 2014)
 
         Parameters:
             data: CVRPData instance
             vehicles: Vehicles number
             timeout: max processing time in seconds
 
-        Returns a solution (MCSClarkeWrightSolution class))
+        Returns a solution (MonteCarloSavingsSolution class))
         """
         start = time.time()
         time_found = None
 
-        best = MCSClarkeWrightSolution(data, vehicles)
+        best = MonteCarloSavingsSolution(data, vehicles)
         best_feasible = best
 
         savings_lists = self.compute_list_of_savings_list(data)
@@ -125,7 +125,7 @@ class MCSClarkeWrightSolver(BaseSolver):
         processed_count = 0
 
         for savings_list in savings_lists:
-            solution = MCSClarkeWrightSolution(data, vehicles)
+            solution = MonteCarloSavingsSolution(data, vehicles)
 
             for i, j in savings_list[:]:
                 if solution.is_complete():

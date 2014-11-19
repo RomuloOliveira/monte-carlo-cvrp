@@ -4,12 +4,12 @@
 import random
 import time
 
-from project.solvers import sequential_clarke_wright
+from project.solvers import clarke_wright
 
-class BinaryMCSCWSSolution(sequential_clarke_wright.SequentialClarkeWrightSolution):
+class BinaryMCSCWSSolution(clarke_wright.ClarkeWrightSolution):
     """Solution class for a BinaryMCS-CWS algorithm"""
 
-class BinaryMCSCWSSolver(sequential_clarke_wright.SequentialClarkeWrightSolver):
+class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
     """BinaryMCS-CWS algorithm solver class"""
 
     def __init__(self):
