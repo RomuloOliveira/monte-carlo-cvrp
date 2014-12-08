@@ -6,14 +6,15 @@ set -e
 . bin/build.sh
 
 files=`find -name '*.vrp' -not -path './input/*-tcc/*' | sort`
-for i in $files
-do
-    basename=`echo $i | sed 's/.*\/\(.*\).vrp/\1/'`
-    vehicles=`echo $i | sed 's/.*-[a-zA-Z]*\([0-9]*\).*.vrp/\1/'`
+executions="1 2 3 4 5"
 
-    executions="1 2 3 4 5"
-    for e in $executions
+for e in $executions
+do
+    for i in $files
     do
+        basename=`echo $i | sed 's/.*\/\(.*\).vrp/\1/'`
+        vehicles=`echo $i | sed 's/.*-[a-zA-Z]*\([0-9]*\).*.vrp/\1/'`
+
         filename="out/$basename-$e.out"
         echo "Processing-$e $basename $vehicles"
         python run.py $i $vehicles > $filename
