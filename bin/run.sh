@@ -5,7 +5,7 @@ set -e
 . bin/clean.sh
 . bin/build.sh
 
-files=`find -name '*.vrp' | sort`
+files=`find -name '*.vrp' -not -path './input/*-tcc/*' | sort`
 for i in $files
 do
     basename=`echo $i | sed 's/.*\/\(.*\).vrp/\1/'`
