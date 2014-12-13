@@ -43,7 +43,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         savings_list = self.compute_savings_list(data)
 
         solution = BinaryMCSCWSSolution(data, vehicles)
-        self._best = None
+        self._best = solution
 
         savings_copy = savings_list[:]
 
