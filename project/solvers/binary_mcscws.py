@@ -19,7 +19,7 @@ class BinaryMCSCWSSolver(clarke_wright.ClarkeWrightSolver):
         """Do a Monte Carlo Simulation"""
         for i, j in savings_list:
             if solution.can_process((i, j)):
-                if 0.05 < random.random() < 0.4:
+                if random.random() > random.uniform(0.05, 0.4):
                     solution, inserted = solution.process((i, j))
 
         if self._best is None and solution.is_complete():
