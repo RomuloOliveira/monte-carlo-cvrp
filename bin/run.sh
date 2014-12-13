@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -e
+# set -e
 
 . bin/clean.sh
 . bin/build.sh
 
 files=`find -name '*.vrp' -not -path './input/*-tcc/*' | sort`
-executions="1 2 3 4 5"
+executions="1 2 3 4 5 6 7 8 9 10"
 
 for e in $executions
 do
@@ -17,6 +17,6 @@ do
 
         filename="out/$basename-$e.out"
         echo "Processing-$e $basename $vehicles"
-        python run.py $i $vehicles > $filename
+        python run.py $i $vehicles > $filename || true
     done
 done
