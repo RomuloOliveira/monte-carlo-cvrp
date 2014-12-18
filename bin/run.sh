@@ -16,7 +16,12 @@ do
         vehicles=`echo $i | sed 's/.*-[a-zA-Z]*\([0-9]*\).*.vrp/\1/'`
 
         filename="out/$basename-$e.out"
-        echo "Processing-$e $basename $vehicles"
-        python run.py $i $vehicles > $filename || true
+
+        if [ ! -f $filename ]; then
+            echo "Processing-$e $basename $vehicles"
+            python run.py $i $vehicles > $filename || true
+        else
+            echo "$basename-$e already processed"
+        fi
     done
 done
