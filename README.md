@@ -6,7 +6,8 @@ Python implementation of the Capacitated Vehicle Routing Problem algorithms usin
 Algorithms:
 
 - Clarke and Wright Savings from (CLARKE; WRIGHT, 1964)
-- BinaryMCS-CWS algorithm from (TAKES, 2010) (http://www.liacs.nl/~ftakes/pdf/vrp.pdf and http://www.liacs.nl/assets/Masterscripties/2010-01FrankTakes.pdf)  
+- BinaryMCS-CWS algorithm from (TAKES, 2010) (http://www.liacs.nl/~ftakes/pdf/vrp.pdf and http://www.liacs.nl/assets/Masterscripties/2010-01FrankTakes.pdf)
+- Monte Carlo Savings (OLIVEIRA, 2014) - my bachelor's thesis
   
 I use virtualenv to manage packages
 
