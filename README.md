@@ -14,5 +14,5 @@ I use virtualenv to manage packages
 ### Example usage
 
 ```bash
-$ python run.py input/A-n32-k5.vrp 5
+$ python run.py input/Augerat/A-n32-k5.vrp 5
 ```
