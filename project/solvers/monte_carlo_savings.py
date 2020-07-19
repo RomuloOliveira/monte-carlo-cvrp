@@ -59,7 +59,10 @@ class MonteCarloSavingsSolution(ClarkeWrightSolution):
 class MonteCarloSavingsSolver(BaseSolver):
     """Monte Carlo Savings algorithm (OLIVEIRA, 2014) solver class"""
 
-    DEFAULT_SIMULATIONS_PER_EXECUTION = 2000
+    # Original article results used 2000 simulations and each
+    # problem file was ran 5 times
+    DEFAULT_SIMULATIONS_PER_EXECUTION = 100
+
     default_lambda_p = 0.05
 
     def __init__(self, lambda_p=None, *args, **kwargs):
