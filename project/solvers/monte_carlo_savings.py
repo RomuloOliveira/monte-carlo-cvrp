@@ -57,8 +57,9 @@ class MonteCarloSavingsSolution(ClarkeWrightSolution):
         return allocated and valid_routes and valid_demands
 
 class MonteCarloSavingsSolver(BaseSolver):
-    """Clark and Wright Savings algorithm solver class"""
+    """Monte Carlo Savings algorithm (OLIVEIRA, 2014) solver class"""
 
+    DEFAULT_SIMULATIONS_PER_EXECUTION = 2000
     default_lambda_p = 0.05
 
     def __init__(self, lambda_p=None, *args, **kwargs):
@@ -78,8 +79,7 @@ class MonteCarloSavingsSolver(BaseSolver):
 
         Returns a list of savings list, ordered by total saving
         """
-
-        for r in range(2000):
+        for r in range(DEFAULT_SIMULATIONS_PER_EXECUTION):
             savings_list = {}
 
             total_savings = 0

@@ -14,7 +14,8 @@ def main():
     if len(sys.argv) < 3: # python main.py <file> <vehicles_number> [<p>]
         return usage()
 
-    data = data_input.read_file(sys.argv[1])
+    input_file = sys.argv[1]
+    data = data_input.read_file(input_file)
     vehicles = int(sys.argv[2])
 
     lambda_p = None
@@ -38,6 +39,7 @@ def main():
     best_solution = None
 
     for solver, algorithm in algorithms:
+        print "=== Starting {} algorithm ===\n".format(algorithm)
         start = time.time()
 
         solution = solver.solve(data, vehicles, timeout)
@@ -63,8 +65,9 @@ def main():
             best_algorithm = algorithm
 
         print
+        print "=== Finished {} algorithm ===\n".format(algorithm)
 
-    print 'Best: {}'.format(best_algorithm)
+    print 'Best solution for \"{}\" problem was from algorithm {}'.format(input_file, best_algorithm)
 
 if __name__ == '__main__':
     main()
