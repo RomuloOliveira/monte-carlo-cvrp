@@ -143,6 +143,20 @@ class Node(object):
 
         return self._name - other
 
+    def __eq__(self, other):
+        if not isinstance(other, Node) or other is None:
+            return False
+
+        return (self._name == other._name
+                and self._demand == other._demand)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __lt__(self, other):
+        if isinstance(other, Node):
+            return self._name - other._name
+
     def __hash__(self):
         return self._name.__hash__()
 
@@ -201,7 +215,7 @@ class CVRPData(object):
         """Returns the distance between node i and node j"""
         a, b = i, j
 
-        if a.name > b.name:
+        if a.name() > b.name():
             a, b = b, a
 
         return self._matrix[a][b]

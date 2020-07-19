@@ -8,7 +8,7 @@ from project import data_input, util
 from project.solvers import clarke_wright, monte_carlo_savings, binary_mcscws
 
 def usage():
-    print "python {} <tspblib_file> <vehicles_number> [<lambda_p>]".format(sys.argv[0])
+    print("python {} <tspblib_file> <vehicles_number> [<lambda_p>]".format(sys.argv[0]))
 
 def main():
     if len(sys.argv) < 3: # python main.py <file> <vehicles_number> [<p>]
@@ -39,7 +39,7 @@ def main():
     best_solution = None
 
     for solver, algorithm in algorithms:
-        print "=== Starting {} algorithm ===\n".format(algorithm)
+        print("=== Starting {} algorithm ===\n".format(algorithm))
         start = time.time()
 
         solution = solver.solve(data, vehicles, timeout)
@@ -47,12 +47,12 @@ def main():
         elapsed = time.time() - start
 
         if not solution.is_complete():
-            print 'Solution from algorithm {} not a complete solution'.format(algorithm)
+            print('Solution from algorithm {} not a complete solution'.format(algorithm))
 
-        print '{} solution:'.format(algorithm)
+        print('{} solution:'.format(algorithm))
         util.print_solution(solution)
 
-        print 'Elapsed time (seconds): {}'.format(elapsed)
+        print('Elapsed time (seconds): {}'.format(elapsed))
 
         if best_algorithm is None:
             best_algorithm = algorithm
@@ -64,10 +64,10 @@ def main():
             best_solution = solution
             best_algorithm = algorithm
 
-        print
-        print "=== Finished {} algorithm ===\n".format(algorithm)
+        print("")
+        print("=== Finished {} algorithm ===\n".format(algorithm))
 
-    print 'Best solution for \"{}\" problem was from algorithm {}'.format(input_file, best_algorithm)
+    print('Best solution for \"{}\" problem was from algorithm {}'.format(input_file, best_algorithm))
 
 if __name__ == '__main__':
     main()

@@ -20,7 +20,7 @@ class BaseSolution(object):
 
     def get_pair(self, pair):
         i, j = pair
-        return (self._nodes[i], self._nodes[j])
+        return (self._nodes[i.name()], self._nodes[j.name()])
 
     def is_complete(self):
         """Returns True if this is a complete solution, i.e, all nodes are allocated"""
@@ -44,7 +44,7 @@ class BaseSolution(object):
             new_route = new_solution._routes[index]
             for node in r.nodes():
                 # Insere new node on new route
-                new_node = new_solution._nodes[node]
+                new_node = new_solution._nodes[node.name()]
                 new_route.allocate([new_node])
 
         return new_solution

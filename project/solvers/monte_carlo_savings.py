@@ -39,7 +39,7 @@ class MonteCarloSavingsSolution(ClarkeWrightSolution):
             new_route = new_solution._routes[index] = models.Route(self._problem, self._problem.capacity())
             for node in r.nodes():
                 # Insere new node on new route
-                new_node = new_solution._nodes[node]
+                new_node = new_solution._nodes[node.name()]
                 new_route.allocate([new_node])
 
         return new_solution
@@ -79,7 +79,7 @@ class MonteCarloSavingsSolver(BaseSolver):
 
         Returns a list of savings list, ordered by total saving
         """
-        for r in range(DEFAULT_SIMULATIONS_PER_EXECUTION):
+        for r in range(self.DEFAULT_SIMULATIONS_PER_EXECUTION):
             savings_list = {}
 
             total_savings = 0
@@ -152,14 +152,14 @@ class MonteCarloSavingsSolver(BaseSolver):
             processed_count = processed_count + 1
             solution_lengths = solution_lengths + solution.length()
 
-        print 'best solution found on {}'.format(time_found)
+        print('best solution found on {}'.format(time_found))
 
         if processed_count:
-            print 'average solution lengths: {}'.format(solution_lengths / float(processed_count))
+            print('average solution lengths: {}'.format(solution_lengths / float(processed_count)))
 
         if not best.is_complete():
             from project import util
-            print 'Best solution not feasible, printing best feasible found'
+            print('Best solution not feasible, printing best feasible found')
             util.print_solution(best_feasible)
 
         return best
